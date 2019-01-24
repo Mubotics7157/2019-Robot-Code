@@ -178,37 +178,11 @@ class Pixy2Handler
 
         System.out.println("Pixy Data: ");
         //System.out.println(returnBuffer[6*8]);
-        for(int i=returnBuffer.length -1; i>=0; i--){
+        /*for(int i=returnBuffer.length -1; i>=0; i--){
             System.out.println(Byte.toString(returnBuffer[i]));
         }
-            /*
-            ojiijopsadliuifu p3298qwu sdpoai p8498u 3789u98uiujsjfjoijdlkjsojisa83po
 
-            oaisijffasdfemc]s
-            e
-
-            esoidfjoijdflkjsadm 
-            admid8e
-            2udj394
-            4
-            e
-
-            sd
-            fsadf
-            as
-            d fsdfjiei3i
-            a
-            sdekfjasdf9e93mmmmmmmmmmmmmmmmmmmmm
-            le
-            adf
-            eooekfopsdkfa
-            asdflkpo
-            pldsplkokfoksef
-
-
-            asodkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkko
-            sodkfasdopkfoekldkdoeoeoeoeoooeoeoeoeoe
-
+            
         }*/
         for(int i = 0; i < Math.ceil(returnBuffer.length/8); i++)
         {
