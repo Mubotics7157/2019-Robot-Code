@@ -7,8 +7,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -19,8 +20,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.autopilot.TrackingHandler;
-import frc.drive.MainDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,16 +34,18 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  public static OI oi = new OI();
-  public static MainDrive drive = new MainDrive();
+  private double turnSpeed = 1f;
+  private DifferentialDrive drive;
+  private Joystick driveStick = new Joystick(0);
+  private WPI_VictorSPX leftS = new WPI_VictorSPX(3);
+  private WPI_VictorSPX leftM = new WPI_VictorSPX(4);
 
-  private enum DriveMode {
-    Unassisted,
-    Assisted
-  }
 
-  private DriveMode currDriveMode = DriveMode.Unassisted;
+  private WPI_TalonSRX rightM = new WPI_TalonSRX(2);
+  private PWMVictorSPX rightS = new PWMVictorSPX(6);
 
+  private NetworkTable chickenVision;
+  private NetworkTableInstance instance;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -52,13 +53,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    instance = NetworkTableInstance.getDefault();
+    chickenVision = instance.getTable("ChickenVision");
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    drive.initDrive();
 
-    //victor2.follow(victor);
-  }
+    leftS.follow(leftM);
+    drive = new DifferentialDrive(leftM, rightM);
+    }
 
   /**
    * This function is called every robot packet, no matter the mode. Use
@@ -70,7 +73,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.periodicDrive();
+    rightS.set(rightM.getMotorOutputPercent());
   }
 
   /**
@@ -112,16 +115,28 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    if (oi.controllerL.getRawButtonPressed(8)) currDriveMode = DriveMode.Unassisted;
-    if (oi.controllerL.getRawButtonPressed(7)) currDriveMode = DriveMode.Assisted;
+    NetworkTableEntry cargoDetected = chickenVision.getEntry("cargoDetected");
+    NetworkTableEntry cargoYaw = chickenVision.getEntry("cargoYaw");
+    
+    if (driveStick.getRawButton(8)) {
+      double targetAngle = 0;
+      if(cargoDetected.getBoolean(false)) {
+				targetAngle = cargoYaw.getDouble(0);
+				SmartDashboard.putNumber("Cargo Yaw", targetAngle);
+			} else {
+				targetAngle = 0;
+			}
 
-    switch (currDriveMode) {
-      case Assisted:
-      drive.driveAutoPilot();
-      break;
-      case Unassisted:
-      drive.tankDrive();
-      break;
+      System.out.println("Yaw: " + targetAngle);
+      if (targetAngle < 0) {
+        drive.arcadeDrive(0, -turnSpeed);
+      }
+      else if (targetAngle > 0) {
+        drive.arcadeDrive(0, turnSpeed);
+      }
+    }
+    else {
+      drive.arcadeDrive(0, 0);
     }
   }
 
