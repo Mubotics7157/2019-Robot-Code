@@ -84,4 +84,8 @@ public class TrackingHandler {
         tapeVision = false;
         cargoVision = true;
     }
+
+    public boolean getCargoDetected(){
+        return cargoDetected.getBoolean(false);
+    }
 }
