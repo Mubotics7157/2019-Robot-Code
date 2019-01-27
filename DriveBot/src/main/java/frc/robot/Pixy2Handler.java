@@ -61,9 +61,9 @@ class Pixy2Handler
         (byte) 0xc1,
         (byte) 0x02,
         (byte) 0x05,
-        (byte) 0x6c,
+        (byte) 0x6C,
         (byte) 0x69,
-        (byte) 0x6e,
+        (byte) 0x6E,
         (byte) 0x65,
         (byte) 0x00
     };

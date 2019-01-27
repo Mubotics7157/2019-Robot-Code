@@ -10,7 +10,9 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -20,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
+ * functions corresponding to each mode, as described in the TimedRobot
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the build.gradle file in the
  * project.
@@ -31,14 +33,25 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private NetworkTable chickenVision;
+  private NetworkTableInstance instance;
+
+  private double kP = 0.0045;
+  private double kI = 0;
+  private double kD = 0;
+  private double lastError = 0;
+  private double deltaError = 0;
+
+  public double turnSpeed = 0f;
+  public double driveSpeed = 0f;
+
   public WPI_TalonSRX talon = new WPI_TalonSRX(2);
   public WPI_VictorSPX victor = new WPI_VictorSPX(3);
   public WPI_VictorSPX victor2 = new WPI_VictorSPX(4);
   public PWMVictorSPX PWMVictor = new PWMVictorSPX(9);
   public Joystick controller1 = new Joystick(0);
-  public Joystick controller2 = new Joystick(1);
-  public Pixy2Handler version = new Pixy2Handler();
   public DifferentialDrive drive = new DifferentialDrive(talon, victor);
+
 
   /**
    * This function is run when the robot is first started up and should be
@@ -49,9 +62,15 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    victor.follow(victor2);
-    //version.init();
-    
+
+    SmartDashboard.putBoolean("Tape", false);
+    instance = NetworkTableInstance.getDefault();
+    chickenVision = instance.getTable("ChickenVision");
+
+    SmartDashboard.putNumber("kP", 0.1);
+    SmartDashboard.putNumber("kD", 0.1);
+    SmartDashboard.putNumber("driveSpeed", 0.1);
+    //victor2.follow(victor);
   }
 
   /**
@@ -64,7 +83,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    
     PWMVictor.set(talon.getMotorOutputPercent());
+
   }
 
   /**
@@ -81,8 +102,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    // autoSelected = SmartDashboard.getString("Auto Selector",
-    // defaultAuto);
+    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
   }
 
@@ -107,27 +127,29 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //PWMVictor.set(-controller1.getRawAxis(1));
-    //talon.set(-controller1.getRawAxis(1));
-    //victor.set(controller2.getRawAxis(1));
-    drive.arcadeDrive(controller1.getRawAxis(1), controller2.getRawAxis(0));
+    kP = SmartDashboard.getNumber("kP", 1);
+    kD = SmartDashboard.getNumber("kD", 1);
+    driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
 
+    NetworkTableEntry cargoDetected = chickenVision.getEntry("cargoDetected");
+    NetworkTableEntry cargoYaw = chickenVision.getEntry("cargoYaw");
+    
+    double error = cargoYaw.getDouble(0);
+    deltaError = error - lastError;
+    double P = error*kP;
+    double D = kD*deltaError;
+    double gain = Math.abs(error)>1 ? P+D : 0;
 
-    if(controller1.getRawButtonPressed(5)){
-      System.out.println("beginning transfer...");
-      //version.RequestBytes();
-      version.HandleInput();
+    if(controller1.getRawButton(1)){
+      System.out.println(cargoYaw.getDouble(0));
       
-      //version.readWord();
+      if(cargoDetected.getBoolean(false)){
+        talon.set(driveSpeed + gain);
+        victor.set(-driveSpeed + gain);
+      }
     }
-    if(controller1.getRawButtonPressed(6)){
-      version.toggleLamp();
-    }
+    lastError = error;
 
-  }
-
-  public void teleopInit(){
-    version.HandleInput();
   }
 
   /**
