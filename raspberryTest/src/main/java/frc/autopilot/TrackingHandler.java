@@ -11,12 +11,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 
 /**
  * Add your docs here.
  */
 public class TrackingHandler {
-    private boolean is_enabled, driverVision, tapeVision, cargoVision;
+    private boolean is_enabled, driverVision, tapeVision, cargoVision, lastDetected;
 	private NetworkTableEntry tapeDetected, cargoDetected, tapeYaw, cargoYaw, driveWanted, tapeWanted, cargoWanted, videoTimestamp;
 	private double targetAngle, timestamp;
 	NetworkTableInstance instance;
@@ -58,15 +59,16 @@ public class TrackingHandler {
 			} else {
 				targetAngle = 0;
             }
-
 			if(cargoDetected.getBoolean(false) && cargoVision) {
+                if (lastDetected != true) Robot.drive.navx.zeroYaw();
+                lastDetected = true;
 				targetAngle = cargoYaw.getDouble(0);
 				SmartDashboard.putNumber("Cargo Yaw", targetAngle);
 			} else {
+                lastDetected = false;
 				targetAngle = 0;
-			}
-
-		
+            }
+            
 		SmartDashboard.putNumber("Cargo Yaw", targetAngle);
 
 	}

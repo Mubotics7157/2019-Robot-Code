@@ -30,6 +30,7 @@ public class MainDrive {
     public static TrackingHandler tracking = new TrackingHandler();
     public AHRS navx = new AHRS(Port.kMXP);
     public OI oi = new OI();
+    double integralError = 0.0f;
 
     private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup;
 
@@ -54,26 +55,32 @@ public class MainDrive {
         driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
         integralWindup = SmartDashboard.getNumber("integralWindup", 1);
         
-        double error = tracking.targetYaw();
-        double integralError = 0.0f;
+        double setpoint = tracking.targetYaw();
+        
+        double error = setpoint - navx.getYaw();
         deltaError = error - lastError;
-        double P = error*kP;
-        double D = kD*deltaError;
-        double I = kI*integralError;
-        double gain = Math.abs(error)>1 ? P+D+I : 0;
-        talon.set(driveSpeed + gain);
-        victor.set(-driveSpeed + gain);
-        lastError = error;
+
         if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
             integralError = integralError + error;   
         }else{
             integralError = 0;
         }
+
+        double P = error*kP;
+        double D = kD*deltaError;
+        double I = kI*integralError;
+        double gain = Math.abs(error)>1 ? P+D+I : 0;
+
+        talon.set(driveSpeed + gain);
+        victor.set(-driveSpeed + gain);
         
+        lastError = error;
     }
 
     public void tankDrive() {
         talon.set(oi.controllerR.getRawAxis(1));
         victor.set(-oi.controllerL.getRawAxis(1));
     }
+    
+    
 }
