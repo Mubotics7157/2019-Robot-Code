@@ -62,6 +62,7 @@ public class MainDrive {
 
         SmartDashboard.putNumber("Error", error);
 
+        //I
         if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
             integralError = integralError + error;   
         }else{
@@ -71,7 +72,39 @@ public class MainDrive {
         double P = error*kP;
         double D = kD*deltaError;
         double I = kI*integralError;
-        double gain = Math.abs(error)>1 ? P+D+I : 0;
+        double gain = Math.abs(error)>1 ? P+I+D : 0;
+
+        talon.set(driveSpeed + gain);
+        victor.set(-driveSpeed + gain);
+        
+        lastError = error;
+    }
+
+    public void drivePerfect() {
+        kP = SmartDashboard.getNumber("kP", 1);
+        kI = SmartDashboard.getNumber("kI", 1);
+        kD = SmartDashboard.getNumber("kD", 1);
+        driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
+        integralWindup = SmartDashboard.getNumber("integralWindup", 1);
+        
+        double setpoint = 90;
+        
+        double error = setpoint - navx.getYaw();
+        deltaError = error - lastError;
+
+        SmartDashboard.putNumber("Error", error);
+
+        //I
+        if(Math.abs(error)<integralWindup){
+            integralError = integralError + error;   
+        }else{
+            integralError = 0;
+        }
+
+        double P = error*kP;
+        double D = kD*deltaError;
+        double I = kI*integralError;
+        double gain = Math.abs(error)>1 ? P+I+D : 0;
 
         talon.set(driveSpeed + gain);
         victor.set(-driveSpeed + gain);
