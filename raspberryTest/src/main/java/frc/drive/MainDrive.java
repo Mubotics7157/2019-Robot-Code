@@ -60,6 +60,8 @@ public class MainDrive {
         double error = setpoint - navx.getYaw();
         deltaError = error - lastError;
 
+        SmartDashboard.putNumber("Error", error);
+
         if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
             integralError = integralError + error;   
         }else{
@@ -81,6 +83,4 @@ public class MainDrive {
         talon.set(oi.controllerR.getRawAxis(1));
         victor.set(-oi.controllerL.getRawAxis(1));
     }
-    
-    
 }

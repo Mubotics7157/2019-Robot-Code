@@ -60,7 +60,10 @@ public class TrackingHandler {
 				targetAngle = 0;
             }
 			if(cargoDetected.getBoolean(false) && cargoVision) {
-                if (lastDetected != true) Robot.drive.navx.zeroYaw();
+                if (lastDetected != true) {
+                    Robot.drive.navx.zeroYaw();
+                    System.out.println("New Cargo Detected");
+                }
                 lastDetected = true;
 				targetAngle = cargoYaw.getDouble(0);
 				SmartDashboard.putNumber("Cargo Yaw", targetAngle);
