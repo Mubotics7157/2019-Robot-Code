@@ -26,7 +26,6 @@ public class MainDrive {
     public WPI_VictorSPX victor = new WPI_VictorSPX(3);
     public WPI_VictorSPX victor2 = new WPI_VictorSPX(4);
     public PWMVictorSPX PWMVictor = new PWMVictorSPX(9);
-    public DifferentialDrive drive = new DifferentialDrive(talon, victor);
     public static TrackingHandler tracking = new TrackingHandler();
     public AHRS navx = new AHRS(Port.kMXP);
     public OI oi = new OI();
@@ -35,11 +34,11 @@ public class MainDrive {
     private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup, lastGyro, setpoint;
 
     public void initDrive() {
-        SmartDashboard.putNumber("kP", 0.1);
-        SmartDashboard.putNumber("kI", 0.1);
-        SmartDashboard.putNumber("kD", 0.1);
-        SmartDashboard.putNumber("driveSpeed", 0.1);
-        SmartDashboard.putNumber("integralWindup", 0.1);
+        SmartDashboard.putNumber("kP", 0.01);
+        SmartDashboard.putNumber("kI", 0);
+        SmartDashboard.putNumber("kD", 0);
+        SmartDashboard.putNumber("driveSpeed", 0);
+        SmartDashboard.putNumber("integralWindup", 0);
         tracking.initTracking();
     }
 
@@ -53,11 +52,11 @@ public class MainDrive {
     }
 
     public void driveAutoPilot() {
-        kP = SmartDashboard.getNumber("kP", 1);
-        kI = SmartDashboard.getNumber("kI", 1);
-        kD = SmartDashboard.getNumber("kD", 1);
-        driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
-        integralWindup = SmartDashboard.getNumber("integralWindup", 1);
+        kP = SmartDashboard.getNumber("kP", 0);
+        kI = SmartDashboard.getNumber("kI", 0);
+        kD = SmartDashboard.getNumber("kD", 0);
+        driveSpeed = SmartDashboard.getNumber("driveSpeed", 0);
+        integralWindup = SmartDashboard.getNumber("integralWindup", 0);
 
         SmartDashboard.putNumber("NavX", navx.getYaw());
         SmartDashboard.putNumber("Setpoint", setpoint);
@@ -69,7 +68,7 @@ public class MainDrive {
 
         //I
         if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
-            integralError = integralError + error;   
+            integralError = integralError + (error*0.2);   
         }else{
             integralError = 0;
         }
@@ -77,7 +76,7 @@ public class MainDrive {
         double P = error*kP;
         double D = kD*deltaError;
         double I = kI*integralError;
-        double gain = Math.abs(error)>1 ? P+I+D : 0;
+        double gain = Math.abs(error)>0.1 ? P+I+D : 0;
 
         talon.set(driveSpeed + gain);
         victor.set(-driveSpeed + gain);

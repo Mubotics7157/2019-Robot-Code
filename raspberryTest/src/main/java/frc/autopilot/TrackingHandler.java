@@ -61,7 +61,7 @@ public class TrackingHandler {
             }
 			if(cargoDetected.getBoolean(false) && cargoVision) {
                 if (lastDetected != true) {
-                    Robot.drive.navx.zeroYaw();
+                    //Robot.drive.navx.zeroYaw();
                     System.out.println("New Cargo Detected");
                 }
                 lastDetected = true;
