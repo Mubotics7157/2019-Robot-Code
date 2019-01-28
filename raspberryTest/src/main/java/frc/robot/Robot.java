@@ -113,7 +113,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (oi.controllerL.getRawButtonPressed(8)) currDriveMode = DriveMode.Unassisted;
-    if (oi.controllerL.getRawButtonPressed(7)) currDriveMode = DriveMode.Assisted;
+    if (oi.controllerL.getRawButtonPressed(7)) {
+      currDriveMode = DriveMode.Assisted;
+      drive.acquireTarget();
+      drive.navx.zeroYaw();
+    }
 
     switch (currDriveMode) {
       case Assisted:

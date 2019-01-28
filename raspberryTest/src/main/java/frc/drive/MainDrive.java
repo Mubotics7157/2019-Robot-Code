@@ -32,7 +32,7 @@ public class MainDrive {
     public OI oi = new OI();
     double integralError = 0.0f;
 
-    private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup;
+    private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup, lastGyro, setpoint;
 
     public void initDrive() {
         SmartDashboard.putNumber("kP", 0.1);
@@ -48,15 +48,20 @@ public class MainDrive {
         tracking.updateTracking();
     }
 
+    public void acquireTarget() {
+        setpoint = tracking.targetYaw();
+    }
+
     public void driveAutoPilot() {
         kP = SmartDashboard.getNumber("kP", 1);
         kI = SmartDashboard.getNumber("kI", 1);
         kD = SmartDashboard.getNumber("kD", 1);
         driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
         integralWindup = SmartDashboard.getNumber("integralWindup", 1);
-        
-        double setpoint = tracking.targetYaw();
-        
+
+        SmartDashboard.putNumber("NavX", navx.getYaw());
+        SmartDashboard.putNumber("Setpoint", setpoint);
+
         double error = setpoint - navx.getYaw();
         deltaError = error - lastError;
 

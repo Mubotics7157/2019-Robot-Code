@@ -73,7 +73,6 @@ public class TrackingHandler {
             }
             
 		SmartDashboard.putNumber("Cargo Yaw", targetAngle);
-
 	}
 	
 	public double targetYaw() {
