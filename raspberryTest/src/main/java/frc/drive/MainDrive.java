@@ -34,9 +34,9 @@ public class MainDrive {
     private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup, lastGyro, setpoint;
 
     public void initDrive() {
-        SmartDashboard.putNumber("kP", 0.01);
+        SmartDashboard.putNumber("kP", 0.033);
         SmartDashboard.putNumber("kI", 0);
-        SmartDashboard.putNumber("kD", 0);
+        SmartDashboard.putNumber("kD", 0.16);
         SmartDashboard.putNumber("driveSpeed", 0);
         SmartDashboard.putNumber("integralWindup", 0);
         tracking.initTracking();
@@ -82,6 +82,7 @@ public class MainDrive {
         victor.set(-driveSpeed + gain);
         
         lastError = error;
+        //acquireTarget();
     }
 
     public void drivePerfect() {

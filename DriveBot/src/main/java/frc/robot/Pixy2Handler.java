@@ -1,15 +1,43 @@
 package frc.robot;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 
 class Pixy2Handler
 {
     boolean lampOn = false;
+    byte[] lastCache = {
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00
+    };
+    byte[] localCache = {
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00,
+        (byte) 0x00
+    };
     //public ArrayList<String> VectorData = new ArrayList<String>();
     public final byte[] CHECKSUM_VERSIONREQUEST = 
     {
@@ -86,23 +114,9 @@ class Pixy2Handler
 
     I2C pixy = new I2C(Port.kOnboard, 0x54);
 
-    public Pixy2Handler()
-    {
-        //pixy.writeBulk(CHECKSUM_VERSIONREQUEST);
-        
-        //byte[] buffer = new byte[32];
-
-        //pixy.readOnly(buffer, 32);
-    }
-
     public void init(){
         pixy.writeBulk(CHECKSUM_SETMODE);
         System.out.println("initializing pixy...");
-    }
-
-    public void RequestBytes()
-    {
-        pixy.writeBulk(CHECKSUM_VERSIONREQUEST);
     }
 
     public void toggleLamp(){
@@ -115,17 +129,34 @@ class Pixy2Handler
         }
     }
 
-    public void testChecksum(){
-        byte[] buffer = new byte[12];
-        pixy.writeBulk(CHECKSUM_GETMAINFEATURES);
-        //pixy.readOnly(buffer, 12);
-    }
-
     public void sendRequest(byte[] byteArray){
         pixy.writeBulk(byteArray);
-        byte[] initBuffer =  new byte[32];
-        pixy.readOnly(initBuffer, 12);
+        byte[] initBuffer =  new byte[14];
+        pixy.readOnly(initBuffer, 14);
+        if(initBuffer[10] != -2 && initBuffer[10] != -128){
+            localCache = initBuffer;
+            lastCache = initBuffer;
+        }else{
+            localCache = lastCache;
+        }
         
+    }
+
+    public void check(){
+
+    }
+
+    public void printLocalCache(){
+        System.out.println("FEATURE-TYPE: " + localCache[6]);
+        System.out.println("FEATURE-LENGTH: " + localCache[7]);
+        System.out.println("x0: " + localCache[8]);
+        System.out.println("y0: " + localCache[9]);
+        System.out.println("x1: " + localCache[10]);
+        System.out.println("y1: " + localCache[11]);
+        System.out.println("index: " + localCache[12]);
+        System.out.println("flags: " + localCache[13]);
+        if((localCache[10]-localCache[8])!=0)
+            System.out.println("angle: " + Math.atan((localCache[11]-localCache[9])/(localCache[10]-localCache[8]))*180/Math.PI);
     }
 
     /*public int readWord() {
@@ -154,6 +185,12 @@ class Pixy2Handler
         byte[] initBuffer = new byte[32];
         
         pixy.readOnly(initBuffer, 12);
+
+        //test this thing
+        for(int i = 0; i < 12; i++)
+        {
+            System.out.println(initBuffer[i]);
+        }
 
         int bufferLength = (int) initBuffer[3];
 //      int bufferFix = (int) Math.floor(bufferLength/16);

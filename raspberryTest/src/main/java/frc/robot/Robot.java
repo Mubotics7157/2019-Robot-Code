@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
 
   public static OI oi = new OI();
   public static MainDrive drive = new MainDrive();
+  public Timer timer = new Timer();
 
   private enum DriveMode {
     Unassisted,
@@ -56,6 +58,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     drive.initDrive();
+    timer.start();
 
     //victor2.follow(victor);
   }
@@ -112,16 +115,28 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    if (oi.controllerL.getRawButtonPressed(8)) currDriveMode = DriveMode.Unassisted;
-    if (oi.controllerL.getRawButtonPressed(7)) {
+    double deadband = 0.05;
+    if(oi.controllerL.getRawAxis(1)>deadband || oi.controllerR.getRawAxis(1)>deadband){
+      currDriveMode = DriveMode.Unassisted;
+    }
+    if (oi.controllerL.getRawButtonPressed(2)) currDriveMode = DriveMode.Unassisted;
+    if(oi.controllerL.getRawButton(1) /*&& (timer.get()/.5)%1 == 0*/){
+
+      //drive.acquireTarget();
+    }
+    if (oi.controllerL.getRawButtonPressed(4)) {
       currDriveMode = DriveMode.Assisted;
-      drive.acquireTarget();
       drive.navx.zeroYaw();
+      drive.acquireTarget();
     }
 
     switch (currDriveMode) {
       case Assisted:
       drive.driveAutoPilot();
+      /*if(timer.get()%1==0){
+        drive.acquireTarget();
+        System.out.println("new setpoint");
+      }*/
       break;
       case Unassisted:
       drive.tankDrive();
