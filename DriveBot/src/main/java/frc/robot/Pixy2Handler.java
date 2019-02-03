@@ -113,6 +113,7 @@ class Pixy2Handler
     };
 
     I2C pixy = new I2C(Port.kOnboard, 0x54);
+    boolean vectorDetected = true;
 
     public void init(){
         pixy.writeBulk(CHECKSUM_SETMODE);
@@ -134,10 +135,12 @@ class Pixy2Handler
         byte[] initBuffer =  new byte[14];
         pixy.readOnly(initBuffer, 14);
         if(initBuffer[10] != -2 && initBuffer[10] != -128){
+            vectorDetected = true;
             localCache = initBuffer;
             lastCache = initBuffer;
         }else{
             localCache = lastCache;
+            vectorDetected = false;
         }
         
     }

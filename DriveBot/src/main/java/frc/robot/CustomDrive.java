@@ -18,7 +18,6 @@ class CustomDrive {
     public Joystick controller1 = new Joystick(0);
     public Joystick controller2 = new Joystick(1);
     public AHRS navx = new AHRS(Port.kMXP);
-    int stage = 0;
 
     int x0 = pixy.localCache[8];
     int y0 = pixy.localCache[9];
@@ -88,7 +87,10 @@ class CustomDrive {
         updateVars();
         System.out.println(x0 + " | " + y0 + " | " + x1 + " | " + y1);
         if(Math.abs((x1-x0))>0.001){
-            angle = Math.atan((y1-y0)/(x1-x0))*180/Math.PI;
+            angle = (Math.toDegrees(Math.atan((y1-y0)/(x0-x1))));
+            if(angle<0){
+                angle = angle + 180; 
+            }
         }
         
         kP = SmartDashboard.getNumber("kP", 0);
@@ -99,7 +101,7 @@ class CustomDrive {
         SmartDashboard.putNumber("NavX", navx.getYaw());
         SmartDashboard.putNumber("Setpoint", setpoint);
 
-        double error = setpoint - angle;
+        double error = setpoint-angle;
         deltaError = error - lastError;
 
         SmartDashboard.putNumber("Error", error);
@@ -110,10 +112,14 @@ class CustomDrive {
         System.out.println("Error: " + error);
         System.out.println("Gain: " + gain);
         System.out.println("Angle: " + angle);
+        //System.out.println("NavX: " + navx.getYaw());
     //drive here
         lastError = error;
     }
     public double getGain(){
         return gain;
     }       
+    public boolean vectorDetected(){
+        return pixy.vectorDetected;
+    }
 }
