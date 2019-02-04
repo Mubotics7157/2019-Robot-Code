@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
   public static OI oi = new OI();
   public static MainDrive drive = new MainDrive();
   public Timer timer = new Timer();
+  boolean firstTime = false;
 
   private enum DriveMode {
     Unassisted,
@@ -116,19 +117,34 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double deadband = 0.05;
+    if(oi.controllerR.getRawButtonPressed(3)){
+      drive.toggleTarget();
+    }
     if(oi.controllerL.getRawAxis(1)>deadband || oi.controllerR.getRawAxis(1)>deadband){
-      currDriveMode = DriveMode.Unassisted;
+      if(oi.controllerL.getRawButton(4) == false){
+        System.out.println("Manual Override");
+        currDriveMode = DriveMode.Unassisted;
+      }
     }
     if (oi.controllerL.getRawButtonPressed(2)) currDriveMode = DriveMode.Unassisted;
     if(oi.controllerL.getRawButton(1) /*&& (timer.get()/.5)%1 == 0*/){
 
       //drive.acquireTarget();
     }
-    if (oi.controllerL.getRawButtonPressed(4)) {
-      currDriveMode = DriveMode.Assisted;
-      drive.navx.zeroYaw();
-      drive.acquireTarget();
+    if(oi.controllerL.getRawButtonReleased(4)){
+      firstTime = true;
     }
+    if (oi.controllerL.getRawButton(4)){
+      if(drive.tracking.getCargoDetected() || drive.tracking.getTapeDetected()){
+        if(firstTime){
+          currDriveMode = DriveMode.Assisted;
+          drive.navx.zeroYaw();
+          drive.acquireTarget();
+          firstTime = false;
+        }
+      }
+    }
+    
 
     switch (currDriveMode) {
       case Assisted:

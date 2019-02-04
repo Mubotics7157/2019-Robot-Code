@@ -85,6 +85,10 @@ public class MainDrive {
         //acquireTarget();
     }
 
+    public void autoDriveTape(){
+        
+    }
+
     public void drivePerfect() {
         kP = SmartDashboard.getNumber("kP", 1);
         kI = SmartDashboard.getNumber("kI", 1);
@@ -120,5 +124,8 @@ public class MainDrive {
     public void tankDrive() {
         talon.set(oi.controllerR.getRawAxis(1));
         victor.set(-oi.controllerL.getRawAxis(1));
+    }
+    public void toggleTarget(){
+        tracking.switchTarget();
     }
 }

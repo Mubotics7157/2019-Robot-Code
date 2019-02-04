@@ -92,4 +92,17 @@ public class TrackingHandler {
     public boolean getCargoDetected(){
         return cargoDetected.getBoolean(false);
     }
+    public boolean getTapeDetected(){
+        return tapeDetected.getBoolean(false);
+    }
+
+    public void switchTarget(){
+        if(tapeVision == true){
+            System.out.println("Tracking Cargo.");
+            targetCargo();
+        }else{
+            System.out.println("Tracking Tape.");
+            targetTape();
+        }
+    }
 }
