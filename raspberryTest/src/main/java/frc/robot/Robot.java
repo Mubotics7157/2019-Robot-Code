@@ -148,6 +148,7 @@ public class Robot extends TimedRobot {
 
     switch (currDriveMode) {
       case Assisted:
+      SmartDashboard.putString("driveMode", "Assisted");
       drive.driveAutoPilot();
       /*if(timer.get()%1==0){
         drive.acquireTarget();
@@ -155,9 +156,15 @@ public class Robot extends TimedRobot {
       }*/
       break;
       case Unassisted:
+      SmartDashboard.putString("driveMode", "Unassisted");
       drive.tankDrive();
       break;
     }
+  }
+
+  @Override
+  public void teleopInit() {
+    
   }
 
   /**

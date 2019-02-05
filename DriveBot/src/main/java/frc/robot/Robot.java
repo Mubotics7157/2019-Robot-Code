@@ -76,16 +76,15 @@ public class Robot extends TimedRobot {
 
     if(drive.controller2.getRawButton(1)){
       drive.followLine();
-      drive.driveVariable(drive.driveSpeed - drive.getGain(), drive.driveSpeed + drive.getGain());
     }
     if(drive.controller2.getRawButtonPressed(1)){
       drive.navx.zeroYaw();
     }
   }
 
-
+  @Override
   public void teleopInit(){
-    //version.HandleInput();
+    
   }
 
   @Override

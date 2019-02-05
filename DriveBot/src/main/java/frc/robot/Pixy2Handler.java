@@ -116,7 +116,7 @@ class Pixy2Handler
     boolean vectorDetected = true;
 
     public void init(){
-        pixy.writeBulk(CHECKSUM_SETMODE);
+        pixy.writeBulk(CHECKSUM_SETLINEMODE);
         System.out.println("initializing pixy...");
     }
 

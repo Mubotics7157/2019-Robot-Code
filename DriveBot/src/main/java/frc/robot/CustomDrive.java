@@ -69,7 +69,6 @@ class CustomDrive {
         y1 = pixy.localCache[11];
         index = pixy.localCache[12];
         flags = pixy.localCache[13];
-        //System.out.println(pixy.localCache[8] + " | " + y0 + " | " + x1 + " | " + y1 + " | ");
     }
 
     public void defaultDrive(){
@@ -113,7 +112,7 @@ class CustomDrive {
         System.out.println("Gain: " + gain);
         System.out.println("Angle: " + angle);
         //System.out.println("NavX: " + navx.getYaw());
-    //drive here
+        driveVariable(driveSpeed - gain, driveSpeed + gain);
         lastError = error;
     }
     public double getGain(){
