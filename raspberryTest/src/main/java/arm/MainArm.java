@@ -41,6 +41,11 @@ public class MainArm {
         master.configMotionCruiseVelocity(Constants.kMaxSensorVelocity/2);
         master.configMotionAcceleration(Constants.kMaxSensorVelocity/2);
         master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+        master.config_kP(0, Constants.kArmP);
+        master.config_kI(0, Constants.kArmI);
+        master.config_kD(0, Constants.kArmD);
+        master.config_kF(0, Constants.kArmF);
+
         slave.follow(master);
     }
 
@@ -51,14 +56,18 @@ public class MainArm {
                 firstHit = false;
             }
         } else firstHit = true;
-        
+
         double setpoint = 0;
         switch (currArmState) {
             case Neutral:
             setpoint = 50;
             break;
         }
-        master.set(ControlMode.MotionMagic, 0, // A * COS(O)
-         DemandType.ArbitraryFeedForward, 0);
+		/* calculate targets from gamepad inputs */
+		double target_sensorUnits = setpoint * Constants.kSensorUnits;
+		double feedFwdTerm = 0.25;	// Percent to add to Closed Loop Output (A * COS(O))
+
+        master.set(ControlMode.MotionMagic, target_sensorUnits,
+         DemandType.ArbitraryFeedForward, feedFwdTerm);
     }
 }

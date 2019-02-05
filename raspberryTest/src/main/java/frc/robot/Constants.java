@@ -25,4 +25,8 @@ public class Constants {
     public static int kArmMaster = 4;
     public static int kArmSlave = 4;
     public static int kMaxSensorVelocity = 4;
+    public static double kArmP = 4096;
+    public static double kArmI = 4096;
+    public static double kArmD = 4096;
+    public static double kArmF = 4096;
 }
