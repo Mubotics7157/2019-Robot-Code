@@ -13,9 +13,9 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SerialPort.Port;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.autopilot.TrackingHandler;
+import frc.robot.Constants;
 import frc.robot.OI;
 
 /**
@@ -31,14 +31,19 @@ public class MainDrive {
     public OI oi = new OI();
     double integralError = 0.0f;
 
-    private double kP, kI, kD, driveSpeed, deltaError, lastError, integralWindup, lastGyro, setpoint;
+    private double kP = Constants.kDriveP, kI = Constants.kDriveI, kD = Constants.kDriveD, 
+    driveSpeed, deltaError, lastError, integralWindup, setpoint;
+
+    private boolean testing = false;
 
     public void initDrive() {
+        if (testing) {
         SmartDashboard.putNumber("kP", 0.033);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0.16);
         SmartDashboard.putNumber("driveSpeed", 0);
         SmartDashboard.putNumber("integralWindup", 0);
+        }
         tracking.initTracking();
     }
 
@@ -52,19 +57,20 @@ public class MainDrive {
     }
 
     public void driveAutoPilot() {
+        double error = setpoint - navx.getYaw();
+        deltaError = error - lastError;
+        if (testing) {
         kP = SmartDashboard.getNumber("kP", 0);
         kI = SmartDashboard.getNumber("kI", 0);
         kD = SmartDashboard.getNumber("kD", 0);
         driveSpeed = SmartDashboard.getNumber("driveSpeed", 0);
         integralWindup = SmartDashboard.getNumber("integralWindup", 0);
 
+        SmartDashboard.putNumber("Error", error);
         SmartDashboard.putNumber("NavX", navx.getYaw());
         SmartDashboard.putNumber("Setpoint", setpoint);
+        }
 
-        double error = setpoint - navx.getYaw();
-        deltaError = error - lastError;
-
-        SmartDashboard.putNumber("Error", error);
 
         //I
         if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
@@ -82,43 +88,10 @@ public class MainDrive {
         victor.set(-driveSpeed + gain);
         
         lastError = error;
-        //acquireTarget();
     }
 
     public void autoDriveTape(){
         
-    }
-
-    public void drivePerfect() {
-        kP = SmartDashboard.getNumber("kP", 1);
-        kI = SmartDashboard.getNumber("kI", 1);
-        kD = SmartDashboard.getNumber("kD", 1);
-        driveSpeed = SmartDashboard.getNumber("driveSpeed", 1);
-        integralWindup = SmartDashboard.getNumber("integralWindup", 1);
-        
-        double setpoint = 90;
-        
-        double error = setpoint - navx.getYaw();
-        deltaError = error - lastError;
-
-        SmartDashboard.putNumber("Error", error);
-
-        //I
-        if(Math.abs(error)<integralWindup){
-            integralError = integralError + error;   
-        }else{
-            integralError = 0;
-        }
-
-        double P = error*kP;
-        double D = kD*deltaError;
-        double I = kI*integralError;
-        double gain = Math.abs(error)>1 ? P+I+D : 0;
-
-        talon.set(driveSpeed + gain);
-        victor.set(-driveSpeed + gain);
-        
-        lastError = error;
     }
 
     public void tankDrive() {
