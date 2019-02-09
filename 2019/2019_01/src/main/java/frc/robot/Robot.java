@@ -6,14 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-
-import com.revrobotics.CANPIDController;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.climb.ClimbMechanism;
 import frc.drive.CustomDrive;
+import frc.robot.Constants.ArmState;
+import frc.arm.Arm;
 
 
 /**
@@ -29,9 +28,10 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  public static OI oi = new OI();
-  public static CustomDrive customDrive = new CustomDrive();
-  public static ClimbMechanism climb = new ClimbMechanism();
+  public OI oi = new OI();
+  public CustomDrive customDrive = new CustomDrive();
+  public ClimbMechanism climb = new ClimbMechanism();
+  public Arm arm = new Arm();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -42,6 +42,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    arm.init();
     customDrive.init();
     climb.init();
   }
@@ -98,7 +99,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    controlInput();
+    processInputs();
+    arm.periodic();
   }
 
   /**
@@ -108,10 +110,14 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
-  public void controlInput(){
+  public void processInputs(){
     customDrive.drive(oi.controller1.getRawAxis(1), oi.controller2.getRawAxis(1));
     if(oi.controller1.getRawButton(1)){
       customDrive.printEncoders();
+    }
+    
+    if (oi.controller1.getRawButton(6)) {
+      arm.moveToState(ArmState.INTAKING);
     }
   }
 }
