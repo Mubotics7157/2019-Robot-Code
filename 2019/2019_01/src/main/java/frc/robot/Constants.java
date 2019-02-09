@@ -37,7 +37,9 @@ public class Constants {
         INTAKING,
         HATCH,
         CARGO,
-        NEUTRAL
+        NEUTRAL,
+        BACKHATCH,
+        BACKCARGO
     }
 
     //CLIMB CONSTANTS
