@@ -101,4 +101,12 @@ public class MainDrive {
     public void toggleTarget(){
         tracking.switchTarget();
     }
+
+    public double getLeftEncoder() {
+        return 0;
+    }
+
+    public double getRightEncoder() {
+        return 0;
+    }
 }
