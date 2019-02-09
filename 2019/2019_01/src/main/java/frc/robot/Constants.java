@@ -33,4 +33,10 @@ public class Constants {
     public static double kArmI = 0;
     public static double kArmD = 0;
     public static double kArmF = 0;
+    public static enum ArmState {
+        INTAKING,
+        HATCH,
+        CARGO,
+        NEUTRAL
+    }
 }
