@@ -53,4 +53,5 @@ public class Constants {
     public static double kRollI = 0;
     public static double kRollD = 0;
     public static double kRollF = 0;
+    public static double kVoltageRamp = 0;
 }

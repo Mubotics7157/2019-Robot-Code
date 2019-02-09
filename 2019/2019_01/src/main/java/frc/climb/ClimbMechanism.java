@@ -8,24 +8,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class ClimbMechanism{
-    WPI_TalonSRX mainLeft; 
-    WPI_TalonSRX slaveLeft; 
-    WPI_TalonSRX mainRight;
-    WPI_TalonSRX slaveRight;
+    WPI_TalonSRX frontLeft; 
+    WPI_TalonSRX backLeft; 
+    WPI_TalonSRX frontRight;
+    WPI_TalonSRX backRight;
     AHRS navx = new AHRS(Port.kMXP);
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
     double integralError = 0;
     double integralErrorR = 0;
-    double voltageRamp;
 
     public void init() {
-        mainLeft = new WPI_TalonSRX(0); //TBD
-        slaveLeft = new WPI_TalonSRX(1); //TBD
-        mainRight = new WPI_TalonSRX(2); //TBD
-        slaveRight = new WPI_TalonSRX(3); //TBD
-        //slaveLeft.follow(mainLeft);
-        //slaveRight.follow(mainRight);
+        frontLeft = new WPI_TalonSRX(Constants.kClimbFrontLeft);
+        backLeft = new WPI_TalonSRX(Constants.kClimbBackLeft);
+        frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
+        backRight = new WPI_TalonSRX(Constants.kClimbBackRight);
         SmartDashboard.putNumber("kP", 0);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0);
@@ -34,15 +31,15 @@ public class ClimbMechanism{
         SmartDashboard.putNumber("kIR", 0);
         SmartDashboard.putNumber("kDR", 0);
         SmartDashboard.putNumber("voltageRamp", 0);
-        voltageRamp = SmartDashboard.getNumber("voltageRamp", 0);
-        mainLeft.configOpenloopRamp(voltageRamp);
-        mainLeft.configClosedloopRamp(voltageRamp);
-        mainRight.configOpenloopRamp(voltageRamp);
-        mainRight.configClosedloopRamp(voltageRamp);
-        slaveLeft.configOpenloopRamp(voltageRamp);
-        slaveLeft.configClosedloopRamp(voltageRamp);
-        slaveRight.configOpenloopRamp(voltageRamp);
-        slaveRight.configClosedloopRamp(voltageRamp);
+        Constants.kVoltageRamp = SmartDashboard.getNumber("voltageRamp", 0);
+        frontLeft.configOpenloopRamp(Constants.kVoltageRamp);
+        frontLeft.configClosedloopRamp(Constants.kVoltageRamp);
+        frontRight.configOpenloopRamp(Constants.kVoltageRamp);
+        frontRight.configClosedloopRamp(Constants.kVoltageRamp);
+        backLeft.configOpenloopRamp(Constants.kVoltageRamp);
+        backLeft.configClosedloopRamp(Constants.kVoltageRamp);
+        backRight.configOpenloopRamp(Constants.kVoltageRamp);
+        backRight.configClosedloopRamp(Constants.kVoltageRamp);
     }
 
     void climb(double driveSpeed){
@@ -64,10 +61,10 @@ public class ClimbMechanism{
         double gain = Math.abs(error)>0.1 ? P+I+D : 0;
         double gainR = Math.abs(errorR)>0.1 ? PR+IR+DR : 0;
 
-        mainLeft.set(driveSpeed-gain-gainR);
-        slaveLeft.set(driveSpeed-gain+gainR);
-        mainRight.set(driveSpeed+gain-gainR);
-        slaveRight.set(driveSpeed+gain+gainR);
+        frontLeft.set(driveSpeed-gain-gainR);
+        backLeft.set(driveSpeed-gain+gainR);
+        frontRight.set(driveSpeed+gain-gainR);
+        backRight.set(driveSpeed+gain+gainR);
 
         integralError = integralError + (error*0.2);  
         lastError = error;
