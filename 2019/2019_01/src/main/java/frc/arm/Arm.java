@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
 public class Arm {
     TalonSRX master;
 	TalonSRX slave;
-	
+
     public void armInit() {
         master = new TalonSRX(10);
         slave = new TalonSRX(20);
@@ -19,7 +19,7 @@ public class Arm {
 		 * Phase sensor to have positive increment when driving Talon Forward (Green LED)
 		 */
 		master.setSensorPhase(true);
-		_talon.setInverted(false);
+		slave.setInverted(false);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
 		//_talon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, Constants.kTimeoutMs);
