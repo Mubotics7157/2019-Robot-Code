@@ -9,8 +9,12 @@ package frc.robot;
 
 import com.revrobotics.CANPIDController;
 
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.climb.ClimbMechanism;
+import frc.drive.CustomDrive;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -27,7 +31,6 @@ public class Robot extends TimedRobot {
 
   public static OI oi = new OI();
   public static CustomDrive customDrive = new CustomDrive();
-  public static Pneumatics pneumatics = new Pneumatics();
   public static ClimbMechanism climb = new ClimbMechanism();
 
   /**
