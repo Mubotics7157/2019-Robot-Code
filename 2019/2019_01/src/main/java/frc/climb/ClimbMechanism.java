@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.climb;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
@@ -21,7 +21,7 @@ public class ClimbMechanism{
     double integralErrorR = 0;
     double voltageRamp;
 
-    void init() {
+    public void init() {
         mainLeft = new WPI_TalonSRX(0); //TBD
         slaveLeft = new WPI_TalonSRX(1); //TBD
         mainRight = new WPI_TalonSRX(2); //TBD
