@@ -5,29 +5,24 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 
 public class ClimbMechanism{
-    WPI_TalonSRX mainLeft; 
-    WPI_TalonSRX slaveLeft; 
-    WPI_TalonSRX mainRight;
-    WPI_TalonSRX slaveRight;
+    WPI_TalonSRX frontLeft; 
+    WPI_TalonSRX backLeft; 
+    WPI_TalonSRX frontRight;
+    WPI_TalonSRX backRight;
     AHRS navx = new AHRS(Port.kMXP);
-    double kP, kPR;
-    double kI, kIR;
-    double kD, kDR;
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
     double integralError = 0;
     double integralErrorR = 0;
-    double voltageRamp;
 
     public void init() {
-        mainLeft = new WPI_TalonSRX(0); //TBD
-        slaveLeft = new WPI_TalonSRX(1); //TBD
-        mainRight = new WPI_TalonSRX(2); //TBD
-        slaveRight = new WPI_TalonSRX(3); //TBD
-        //slaveLeft.follow(mainLeft);
-        //slaveRight.follow(mainRight);
+        frontLeft = new WPI_TalonSRX(Constants.kClimbFrontLeft);
+        backLeft = new WPI_TalonSRX(Constants.kClimbBackLeft);
+        frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
+        backRight = new WPI_TalonSRX(Constants.kClimbBackRight);
         SmartDashboard.putNumber("kP", 0);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0);
@@ -36,24 +31,18 @@ public class ClimbMechanism{
         SmartDashboard.putNumber("kIR", 0);
         SmartDashboard.putNumber("kDR", 0);
         SmartDashboard.putNumber("voltageRamp", 0);
-        voltageRamp = SmartDashboard.getNumber("voltageRamp", 0);
-        mainLeft.configOpenloopRamp(voltageRamp);
-        mainLeft.configClosedloopRamp(voltageRamp);
-        mainRight.configOpenloopRamp(voltageRamp);
-        mainRight.configClosedloopRamp(voltageRamp);
-        slaveLeft.configOpenloopRamp(voltageRamp);
-        slaveLeft.configClosedloopRamp(voltageRamp);
-        slaveRight.configOpenloopRamp(voltageRamp);
-        slaveRight.configClosedloopRamp(voltageRamp);
+        Constants.kVoltageRamp = SmartDashboard.getNumber("voltageRamp", 0);
+        frontLeft.configOpenloopRamp(Constants.kVoltageRamp);
+        frontLeft.configClosedloopRamp(Constants.kVoltageRamp);
+        frontRight.configOpenloopRamp(Constants.kVoltageRamp);
+        frontRight.configClosedloopRamp(Constants.kVoltageRamp);
+        backLeft.configOpenloopRamp(Constants.kVoltageRamp);
+        backLeft.configClosedloopRamp(Constants.kVoltageRamp);
+        backRight.configOpenloopRamp(Constants.kVoltageRamp);
+        backRight.configClosedloopRamp(Constants.kVoltageRamp);
     }
 
     void climb(double driveSpeed){
-        kP = SmartDashboard.getNumber("kP", 0);
-        kI = SmartDashboard.getNumber("kI", 0);
-        kD = SmartDashboard.getNumber("kD", 0);
-        kPR = SmartDashboard.getNumber("kPR", 0);
-        kIR = SmartDashboard.getNumber("kIR", 0);
-        kDR = SmartDashboard.getNumber("kDR", 0);
         error = navx.getPitch();
         errorR = navx.getRoll();
         SmartDashboard.putNumber("error", error);
@@ -61,21 +50,21 @@ public class ClimbMechanism{
         deltaError = error-lastError;
         deltaErrorR = errorR - lastErrorR;
 
-        double P = error*kP;
-        double D = kD*deltaError;
-        double I = kI*integralError;
+        double P = error*Constants.kPitchP;
+        double D = Constants.kPitchD*deltaError;
+        double I = Constants.kPitchI*integralError;
 
-        double PR = errorR*kPR;
-        double DR = kD*deltaErrorR;
-        double IR = kIR*integralErrorR;
+        double PR = errorR*Constants.kRollP;
+        double DR = Constants.kRollD*deltaErrorR;
+        double IR = Constants.kRollI*integralErrorR;
 
         double gain = Math.abs(error)>0.1 ? P+I+D : 0;
         double gainR = Math.abs(errorR)>0.1 ? PR+IR+DR : 0;
 
-        mainLeft.set(driveSpeed-gain-gainR);
-        slaveLeft.set(driveSpeed-gain+gainR);
-        mainRight.set(driveSpeed+gain-gainR);
-        slaveRight.set(driveSpeed+gain+gainR);
+        frontLeft.set(driveSpeed-gain-gainR);
+        backLeft.set(driveSpeed-gain+gainR);
+        frontRight.set(driveSpeed+gain-gainR);
+        backRight.set(driveSpeed+gain+gainR);
 
         integralError = integralError + (error*0.2);  
         lastError = error;

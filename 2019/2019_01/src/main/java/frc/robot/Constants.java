@@ -37,6 +37,23 @@ public class Constants {
         INTAKING,
         HATCH,
         CARGO,
-        NEUTRAL
+        NEUTRAL,
+        BACKHATCH,
+        BACKCARGO
     }
+
+    //CLIMB CONSTANTS
+    public static final int kClimbFrontLeft = 0;
+    public static final int kClimbFrontRight = 0;
+    public static final int kClimbBackLeft = 0;
+    public static final int kClimbBackRight = 0;
+    public static double kPitchP = 0;
+    public static double kPitchI = 0;
+    public static double kPitchD = 0;
+    public static double kPitchF = 0;
+    public static double kRollP = 0;
+    public static double kRollI = 0;
+    public static double kRollD = 0;
+    public static double kRollF = 0;
+    public static double kVoltageRamp = 0;
 }
