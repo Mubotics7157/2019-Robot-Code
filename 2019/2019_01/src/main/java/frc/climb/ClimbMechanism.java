@@ -5,6 +5,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 
 public class ClimbMechanism{
     WPI_TalonSRX mainLeft; 
@@ -12,9 +13,6 @@ public class ClimbMechanism{
     WPI_TalonSRX mainRight;
     WPI_TalonSRX slaveRight;
     AHRS navx = new AHRS(Port.kMXP);
-    double kP, kPR;
-    double kI, kIR;
-    double kD, kDR;
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
     double integralError = 0;
@@ -48,12 +46,6 @@ public class ClimbMechanism{
     }
 
     void climb(double driveSpeed){
-        kP = SmartDashboard.getNumber("kP", 0);
-        kI = SmartDashboard.getNumber("kI", 0);
-        kD = SmartDashboard.getNumber("kD", 0);
-        kPR = SmartDashboard.getNumber("kPR", 0);
-        kIR = SmartDashboard.getNumber("kIR", 0);
-        kDR = SmartDashboard.getNumber("kDR", 0);
         error = navx.getPitch();
         errorR = navx.getRoll();
         SmartDashboard.putNumber("error", error);
@@ -61,13 +53,13 @@ public class ClimbMechanism{
         deltaError = error-lastError;
         deltaErrorR = errorR - lastErrorR;
 
-        double P = error*kP;
-        double D = kD*deltaError;
-        double I = kI*integralError;
+        double P = error*Constants.kPitchP;
+        double D = Constants.kPitchD*deltaError;
+        double I = Constants.kPitchI*integralError;
 
-        double PR = errorR*kPR;
-        double DR = kD*deltaErrorR;
-        double IR = kIR*integralErrorR;
+        double PR = errorR*Constants.kRollP;
+        double DR = Constants.kRollD*deltaErrorR;
+        double IR = Constants.kRollI*integralErrorR;
 
         double gain = Math.abs(error)>0.1 ? P+I+D : 0;
         double gainR = Math.abs(errorR)>0.1 ? PR+IR+DR : 0;
