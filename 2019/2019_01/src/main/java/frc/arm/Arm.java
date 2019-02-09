@@ -1,25 +1,24 @@
 package frc.arm;
-
+import frc.robot.Constants;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Joystick;
 
 public class Arm {
-    WPI_TalonSRX _talon;
-	WPI_TalonSRX slaveArm;
-	public 
-    public void init(){
-        _talon = new WPI_TalonSRX(10);
-        slaveArm = new WPI_TalonSRX(20);
-        slaveArm.follow(_talon);
-
+    TalonSRX master;
+	TalonSRX slave;
+	
+    public void armInit() {
+        master = new TalonSRX(10);
+        slave = new TalonSRX(20);
+        slave.follow(master);
         /**
 		 * Configure Talon SRX Output and Sesnor direction accordingly
 		 * Invert Motor to have green LEDs when driving Talon Forward / Requesting Postiive Output
 		 * Phase sensor to have positive increment when driving Talon Forward (Green LED)
 		 */
-		_talon.setSensorPhase(true);
+		master.setSensorPhase(true);
 		_talon.setInverted(false);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
@@ -34,7 +33,7 @@ public class Arm {
 
 		/* Set Motion Magic gains in slot0 - see documentation */
 		_talon.selectProfileSlot(Constants.kSlotIdx, Constants.kPIDLoopIdx);
-		_talon.config_kF(Constants.kSlotIdx, Constants.kGains.kF, Constants.kTimeoutMs);
+		_talon.config_kF(Constants.kSlotIdx, Constants.Gains.kF, Constants.kTimeoutMs);
 		_talon.config_kP(Constants.kSlotIdx, Constants.kGains.kP, Constants.kTimeoutMs);
 		_talon.config_kI(Constants.kSlotIdx, Constants.kGains.kI, Constants.kTimeoutMs);
 		_talon.config_kD(Constants.kSlotIdx, Constants.kGains.kD, Constants.kTimeoutMs);
@@ -42,10 +41,6 @@ public class Arm {
 		/* Set acceleration and vcruise velocity - see documentation */
 		_talon.configMotionCruiseVelocity(15000, Constants.kTimeoutMs);
 		_talon.configMotionAcceleration(6000, Constants.kTimeoutMs);
-
-		/* Zero the sensor */
-		_talon.setSelectedSensorPosition(0, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
-        
     }
 
     public void periodic(){
