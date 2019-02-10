@@ -39,7 +39,8 @@ public class Constants {
         CARGO,
         NEUTRAL,
         BACKHATCH,
-        BACKCARGO
+        BACKCARGO,
+        BACKINTAKING
     }
 
     //CLIMB CONSTANTS
@@ -56,4 +57,10 @@ public class Constants {
     public static double kRollD = 0;
     public static double kRollF = 0;
     public static double kVoltageRamp = 0;
+    public static int kForkLeft = 0;
+    public static int kForkRight = 0;
+
+    //INTAKE CONSTANTS
+    public static final int kIntakeLeft = 0;
+    public static final int kIntakeRight = 0;
 }

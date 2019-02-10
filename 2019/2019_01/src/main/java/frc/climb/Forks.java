@@ -5,24 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.arm;
+package frc.climb;
 
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Servo;
 import frc.robot.Constants;
 
-/**
- * Add your docs here.
- */
-public class Intake {
-    Spark left;
-    Spark right;
+//forks class omegalul
 
+public class Forks {
+    Servo forkL;
+    Servo forkR;
     public void init(){
-        left = new Spark(Constants.kIntakeLeft);
-        right = new Spark(Constants.kIntakeRight);
-    }
-    public void intake(double speed){
-        left.set(speed);
-        right.set(-speed);
+        forkL = new Servo(Constants.kForkLeft);
+        forkR = new Servo(Constants.kForkRight);
     }
 }
+

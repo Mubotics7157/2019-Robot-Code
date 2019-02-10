@@ -1,10 +1,15 @@
 package frc.drive;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
+import frc.tracking.TrackingHandler;
 
 public class CustomDrive{
 
@@ -54,5 +59,58 @@ public class CustomDrive{
 
     public void printEncoders(){
         System.out.println("Velocity: " + Math.round(leftSpark.getEncoder().getVelocity()) + " Position:" + leftSpark.getEncoder().getPosition()/10.71);
+    }
+    //-----------TRACKING DRIVE (CARGO/TAPE)---------------
+    private double kP = Constants.kDriveP, kI = Constants.kDriveI, kD = Constants.kDriveD, 
+    driveSpeed, deltaError, lastError, integralWindup, setpoint;
+    public AHRS navx;
+    boolean testing = false;
+    TrackingHandler tracking;
+    double integralError = 0.0f;
+
+    public void initTracking() {
+        navx = new AHRS(Port.kMXP);
+        tracking = new TrackingHandler();
+        if (testing) {
+            SmartDashboard.putNumber("kP", 0.033);
+            SmartDashboard.putNumber("kI", 0);
+            SmartDashboard.putNumber("kD", 0.16);
+            SmartDashboard.putNumber("driveSpeed", 0);
+            SmartDashboard.putNumber("integralWindup", 0);
+        }
+        tracking.initTracking();
+    }
+
+    public void driveAutoPilot() {
+        double error = setpoint - navx.getYaw();
+        deltaError = error - lastError;
+        if (testing) {
+        kP = SmartDashboard.getNumber("kP", 0);
+        kI = SmartDashboard.getNumber("kI", 0);
+        kD = SmartDashboard.getNumber("kD", 0);
+        driveSpeed = SmartDashboard.getNumber("driveSpeed", 0);
+        integralWindup = SmartDashboard.getNumber("integralWindup", 0);
+
+        SmartDashboard.putNumber("Error", error);
+        SmartDashboard.putNumber("NavX", navx.getYaw());
+        SmartDashboard.putNumber("Setpoint", setpoint);
+        }
+
+
+        //I
+        if(tracking.getCargoDetected() && Math.abs(error)<integralWindup){
+            integralError = integralError + (error*0.2);   
+        }else{
+            integralError = 0;
+        }
+
+        double P = error*kP;
+        double D = kD*deltaError;
+        double I = kI*integralError;
+        double gain = Math.abs(error)>0.1 ? P+I+D : 0;
+
+        drive(driveSpeed + gain, driveSpeed - gain);
+        
+        lastError = error;
     }
 }

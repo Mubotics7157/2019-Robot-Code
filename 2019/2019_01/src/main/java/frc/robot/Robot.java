@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.climb.ClimbMechanism;
+import frc.climb.Forks;
 import frc.drive.CustomDrive;
 import frc.robot.Constants.ArmState;
 import frc.arm.Arm;
-
+import frc.arm.Intake;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,7 +33,8 @@ public class Robot extends TimedRobot {
   public CustomDrive customDrive = new CustomDrive();
   public ClimbMechanism climb = new ClimbMechanism();
   public Arm arm = new Arm();
-
+  public Intake intake = new Intake();
+  public Forks forks = new Forks();
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -45,6 +47,8 @@ public class Robot extends TimedRobot {
     arm.init();
     customDrive.init();
     climb.init();
+    intake.init();
+    forks.init();
   }
 
   /**
@@ -119,5 +123,6 @@ public class Robot extends TimedRobot {
     if (oi.controller1.getRawButton(6)) {
       arm.moveToState(ArmState.INTAKING);
     }
+    intake.intake(oi.controller1.getRawAxis(1));
   }
 }
