@@ -19,5 +19,17 @@ public class Forks {
         forkL = new Servo(Constants.kForkLeft);
         forkR = new Servo(Constants.kForkRight);
     }
+    public void dropForks(){
+        forkL.set(1);
+        forkR.set(1);
+    }
+    public void reset(){
+        forkL.set(0);
+        forkR.set(0);
+    }
+
+    public void eatDinner(){
+        System.out.println("mmmm so delicious...");
+    }
 }
 

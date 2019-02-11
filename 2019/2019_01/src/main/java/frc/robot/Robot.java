@@ -124,5 +124,12 @@ public class Robot extends TimedRobot {
       arm.moveToState(ArmState.INTAKING);
     }
     intake.intake(oi.controller1.getRawAxis(1));
+    arm.setFreehandInput(oi.controller1.getRawAxis(1));
+
+    if(oi.controller1.getRawButton(1)&&oi.controller1.getRawButton(2)&&oi.controller1.getRawButton(3)&&oi.controller1.getRawButton(4)&&
+    oi.controller1.getRawButton(5)&&oi.controller1.getRawButton(6)&&oi.controller1.getRawButton(7)&&oi.controller1.getRawButton(8)&&
+    oi.controller1.getRawButton(10)&&oi.controller1.getRawButton(11)){
+      forks.eatDinner();
+    }
   }
 }

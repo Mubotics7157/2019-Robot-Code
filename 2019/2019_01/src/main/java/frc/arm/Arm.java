@@ -6,12 +6,12 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.Joystick;
-
 public class Arm {
     TalonSRX master;
 	TalonSRX slave;
 	ArmState curArmState = ArmState.NEUTRAL;
+	double setpoint = 0;
+	double input = 0;
 
     public void init() {
         master = new TalonSRX(10);
@@ -48,7 +48,6 @@ public class Arm {
     }
 
     public void periodic(){
-		double setpoint = 0;
 		
 		switch (curArmState) {
 			case NEUTRAL:
@@ -57,10 +56,31 @@ public class Arm {
 			case INTAKING:
 			setpoint = 0;
 			break;
+			case BACKINTAKING:
+			setpoint = 180;
+			break;
+			case CARGO:
+			break;
+			case BACKCARGO:
+			break;
+			case HATCH:
+			break;
+			case BACKHATCH:
+			break;
+			case FREEHAND:
+			break;
 		}
 		double targetPos = setpoint * Constants.kSensorUnits;
 		double arbFeedForward = 0; //COS (O) * kFA
-		master.set(ControlMode.MotionMagic, arbFeedForward, DemandType.ArbitraryFeedForward, targetPos);
+		if(curArmState == ArmState.FREEHAND){
+			master.set(ControlMode.PercentOutput, input);
+		}else{
+			master.set(ControlMode.MotionMagic, arbFeedForward, DemandType.ArbitraryFeedForward, targetPos);
+		}
+	}
+
+	public void setFreehandInput(double speed){
+		input = speed;
 	}
 	
 	public void moveToState(ArmState toMove) {

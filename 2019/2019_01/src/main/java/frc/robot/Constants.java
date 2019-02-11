@@ -40,7 +40,8 @@ public class Constants {
         NEUTRAL,
         BACKHATCH,
         BACKCARGO,
-        BACKINTAKING
+        BACKINTAKING,
+        FREEHAND
     }
 
     //CLIMB CONSTANTS
@@ -59,6 +60,10 @@ public class Constants {
     public static double kVoltageRamp = 0;
     public static int kForkLeft = 0;
     public static int kForkRight = 0;
+    public static enum ClimbState {
+        SLOW,
+        FAST
+    }
 
     //INTAKE CONSTANTS
     public static final int kIntakeLeft = 0;

@@ -6,23 +6,27 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Constants.ClimbState;
 
 public class ClimbMechanism{
     WPI_TalonSRX frontLeft; 
     WPI_TalonSRX backLeft; 
     WPI_TalonSRX frontRight;
     WPI_TalonSRX backRight;
-    AHRS navx = new AHRS(Port.kMXP);
+    AHRS navx;
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
     double integralError = 0;
     double integralErrorR = 0;
+    ClimbState curClimbState;
 
     public void init() {
         frontLeft = new WPI_TalonSRX(Constants.kClimbFrontLeft);
         backLeft = new WPI_TalonSRX(Constants.kClimbBackLeft);
         frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
         backRight = new WPI_TalonSRX(Constants.kClimbBackRight);
+        navx = new AHRS(Port.kMXP);
+        curClimbState = ClimbState.FAST;
         SmartDashboard.putNumber("kP", 0);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0);
@@ -43,6 +47,14 @@ public class ClimbMechanism{
     }
 
     void climb(double driveSpeed){
+        switch(curClimbState){
+            case FAST:
+            driveSpeed = 0.8;
+            break;
+            case SLOW:
+            driveSpeed = 0.6;
+            break;
+        }
         error = navx.getPitch();
         errorR = navx.getRoll();
         SmartDashboard.putNumber("error", error);
