@@ -26,7 +26,7 @@ public class ClimbMechanism{
         frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
         backRight = new WPI_TalonSRX(Constants.kClimbBackRight);
         navx = new AHRS(Port.kMXP);
-        curClimbState = ClimbState.FAST;
+        curClimbState = ClimbState.TWOBOTFAST;
         SmartDashboard.putNumber("kP", 0);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0);
@@ -48,10 +48,16 @@ public class ClimbMechanism{
 
     void climb(double driveSpeed){
         switch(curClimbState){
-            case FAST:
+            case ONEBOTFAST:
             driveSpeed = 0.8;
             break;
-            case SLOW:
+            case ONEBOTSLOW:
+            driveSpeed = 0.6;
+            break;
+            case TWOBOTFAST:
+            driveSpeed = 0.8;
+            break;
+            case TWOBOTSLOW:
             driveSpeed = 0.6;
             break;
         }

@@ -4,26 +4,33 @@ import frc.robot.Constants.ArmState;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm {
     TalonSRX master;
-	TalonSRX slave;
-	ArmState curArmState = ArmState.NEUTRAL;
-	double setpoint = 0;
+	VictorSPX slave;
+	ArmState curArmState = ArmState.FREEHAND;
+	double setpoint = 111;
 	double input = 0;
 
     public void init() {
-        master = new TalonSRX(10);
-        slave = new TalonSRX(20);
+        master = new TalonSRX(2);
+        slave = new VictorSPX(4);
         slave.follow(master);
         /**
 		 * Configure Talon SRX Output and Sesnor direction accordingly
 		 * Invert Motor to have green LEDs when driving Talon Forward / Requesting Postiive Output
 		 * Phase sensor to have positive increment when driving Talon Forward (Green LED)
 		 */
-		master.setSensorPhase(true);
+		master.setSensorPhase(false);
 		slave.setInverted(false);
+		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+		master.setSelectedSensorPosition(0);
+		master.selectProfileSlot(0, 0);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
 		//master.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, Constants.kTimeoutMs);
@@ -43,21 +50,22 @@ public class Arm {
 		master.config_kD(Constants.kSlotIdx, Constants.kArmGains.kD, Constants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		master.configMotionCruiseVelocity(15000, Constants.kTimeoutMs);
-		master.configMotionAcceleration(6000, Constants.kTimeoutMs);
+		master.configMotionCruiseVelocity(1318, Constants.kTimeoutMs);
+		master.configMotionAcceleration(1977, Constants.kTimeoutMs);
     }
 
     public void periodic(){
 		
 		switch (curArmState) {
+			
 			case NEUTRAL:
-			setpoint = 90;
+			setpoint = -90;
 			break;
 			case INTAKING:
 			setpoint = 0;
 			break;
 			case BACKINTAKING:
-			setpoint = 180;
+			setpoint = -180;
 			break;
 			case CARGO:
 			break;
@@ -70,13 +78,20 @@ public class Arm {
 			case FREEHAND:
 			break;
 		}
-		double targetPos = setpoint * Constants.kSensorUnits;
-		double arbFeedForward = 0; //COS (O) * kFA
+		double targetPos = setpoint * Constants.kSensorUnits * Constants.kGearRatio / 360;
+		double arbFeedForward = 1;//Math.cos(master.getSelectedSensorPosition()*Constants.kArmF);
+		SmartDashboard.putNumber("targetPOS", targetPos);
+		SmartDashboard.putNumber("setpoint", setpoint);
+		printEncoder();
 		if(curArmState == ArmState.FREEHAND){
 			master.set(ControlMode.PercentOutput, input);
 		}else{
-			master.set(ControlMode.MotionMagic, arbFeedForward, DemandType.ArbitraryFeedForward, targetPos);
+			master.set(ControlMode.MotionMagic, targetPos);
+			
 		}
+	}
+	public void printEncoder(){
+		SmartDashboard.putNumber("Master Encoder", master.getSelectedSensorPosition());
 	}
 
 	public void setFreehandInput(double speed){
@@ -85,5 +100,8 @@ public class Arm {
 	
 	public void moveToState(ArmState toMove) {
 		curArmState = toMove;
+	}
+	public void zeroEncoder(){
+		master.setSelectedSensorPosition(0);
 	}
 }

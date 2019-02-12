@@ -19,7 +19,7 @@ public class Forks {
         forkL = new Servo(Constants.kForkLeft);
         forkR = new Servo(Constants.kForkRight);
     }
-    public void dropForks(){
+    public void drop(){
         forkL.set(1);
         forkR.set(1);
     }

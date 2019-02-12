@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -26,6 +27,8 @@ public class Robot extends TimedRobot {
 
   public Pixy2Handler version = new Pixy2Handler();
   public CustomDrive drive = new CustomDrive();
+  public Servo servo = new Servo(8);
+  public Joystick joy = new Joystick(0);
 
   @Override
   public void robotInit() {
@@ -63,6 +66,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive.defaultDrive();
+    servo.set(joy.getRawAxis(0));
     //version.sendRequest(version.CHECKSUM_GETMAINFEATURES);
     
     if(drive.controller1.getRawButtonPressed(1)){
@@ -75,7 +79,7 @@ public class Robot extends TimedRobot {
     }
 
     if(drive.controller2.getRawButton(1)){
-      drive.followLine();
+      
     }
     if(drive.controller2.getRawButtonPressed(1)){
       drive.navx.zeroYaw();

@@ -45,10 +45,11 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     arm.init();
-    customDrive.init();
-    climb.init();
-    intake.init();
-    forks.init();
+    //customDrive.init();
+    //customDrive.initTracking();
+    //climb.init();
+    //intake.init();
+    //forks.init();
   }
 
   /**
@@ -115,21 +116,33 @@ public class Robot extends TimedRobot {
   }
 
   public void processInputs(){
-    customDrive.drive(oi.controller1.getRawAxis(1), oi.controller2.getRawAxis(1));
-    if(oi.controller1.getRawButton(1)){
-      customDrive.printEncoders();
+    /*switch(customDrive.curDriveState){
+      case MANUAL:
+      customDrive.drive(oi.axis(1,1), oi.axis(2,1));
+      case AUTO:
+      customDrive.driveAutoPilot();
+    }*/
+
+    if(oi.controller1.getRawButtonPressed(6)){
+      arm.zeroEncoder();
     }
-    
-    if (oi.controller1.getRawButton(6)) {
+    if (oi.controller1.getRawButtonPressed(2)){
       arm.moveToState(ArmState.INTAKING);
     }
-    intake.intake(oi.controller1.getRawAxis(1));
+    if(oi.controller1.getRawButtonPressed(3)){
+      arm.moveToState(ArmState.NEUTRAL);
+    }
+    if(oi.controller1.getRawButtonPressed(4)){
+      arm.moveToState(ArmState.CARGO);
+    }
+    if(oi.controller1.getRawButtonPressed(5)){
+      arm.moveToState(ArmState.FREEHAND);
+    }
+    //intake.intake(oi.controller1.getRawAxis(1));
     arm.setFreehandInput(oi.controller1.getRawAxis(1));
 
-    if(oi.controller1.getRawButton(1)&&oi.controller1.getRawButton(2)&&oi.controller1.getRawButton(3)&&oi.controller1.getRawButton(4)&&
-    oi.controller1.getRawButton(5)&&oi.controller1.getRawButton(6)&&oi.controller1.getRawButton(7)&&oi.controller1.getRawButton(8)&&
-    oi.controller1.getRawButton(10)&&oi.controller1.getRawButton(11)){
+    /*if(oi.bDown(1,1)&&oi.bDown(1,2)&&oi.bDown(1,3)&&oi.bDown(1,4)&&oi.bDown(1,5)&&oi.bDown(1,6)&&oi.bDown(1,7)&&oi.bDown(1,8)){
       forks.eatDinner();
-    }
+    }*/
   }
 }

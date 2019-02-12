@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveState;
 import frc.tracking.TrackingHandler;
 
 public class CustomDrive{
@@ -20,6 +21,7 @@ public class CustomDrive{
     CANPIDController left;
     CANPIDController right;
     DifferentialDrive drive;
+    public DriveState curDriveState;
 
     double kPl = 0, kIl = 0, kDl = 0, kFl = 0, kFFl = 0;
     double kPr = 0, kIr = 0, kDr = 0, kFr = 0, kFFr = 0;
@@ -34,6 +36,7 @@ public class CustomDrive{
         right = new CANPIDController(rightSpark);
         rightSpark2.follow(rightSpark);
         drive = new DifferentialDrive(leftSpark, rightSpark);
+        curDriveState = DriveState.MANUAL;
         //initPID();
     } 
 

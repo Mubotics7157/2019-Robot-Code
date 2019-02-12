@@ -3,8 +3,7 @@ package frc.tracking;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 
-class Pixy2Handler
-{
+public class Pixy2Handler{
     boolean lampOn = false;
     byte[] lastCache = {
         (byte) 0x00,
@@ -39,8 +38,7 @@ class Pixy2Handler
         (byte) 0x00
     };
     //public ArrayList<String> VectorData = new ArrayList<String>();
-    public final byte[] CHECKSUM_VERSIONREQUEST = 
-    {
+    public final byte[] CHECKSUM_VERSIONREQUEST = {
         (byte) 0xae,  // first byte of no_checksum_sync (little endian -> least-significant byte first)
         (byte) 0xc1,  // second byte of no_checksum_sync
         (byte) 0x0e,  // this is the version request type

@@ -23,16 +23,22 @@ public class Constants {
     public static int kTimeoutMs = 30;
     public static int kSlotIdx = 0;
     static final Gains kGains = new Gains(0.2, 0.0, 0.0, 0.2, 0, 1.0);
+    public static enum DriveState {
+        MANUAL,
+        AUTO
+    }
 
     //ARM CONSTANTS
     public static final int kArmMaster = 4;
-    public static final Gains kArmGains = new Gains(0, 0, 0, 0, 0, 1);
     public static final int kArmSlave = 4;
+
     public static final int kMaxSensorVelocity = 4;
-    public static double kArmP = 0;
+    public static final double kGearRatio = 16;
+    public static double kArmP = 2.5;
     public static double kArmI = 0;
     public static double kArmD = 0;
-    public static double kArmF = 0;
+    public static double kArmF = 0.388;
+    public static final Gains kArmGains = new Gains(kArmP, kArmI, kArmD, kArmF, 0, 1);
     public static enum ArmState {
         INTAKING,
         HATCH,
@@ -58,11 +64,13 @@ public class Constants {
     public static double kRollD = 0;
     public static double kRollF = 0;
     public static double kVoltageRamp = 0;
-    public static int kForkLeft = 0;
+    public static int kForkLeft = 8;
     public static int kForkRight = 0;
     public static enum ClimbState {
-        SLOW,
-        FAST
+        ONEBOTSLOW,
+        ONEBOTFAST,
+        TWOBOTSLOW,
+        TWOBOTFAST
     }
 
     //INTAKE CONSTANTS
