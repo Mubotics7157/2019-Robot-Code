@@ -15,13 +15,30 @@ public class OI{
     public boolean bDown(int controller, int id){
         return controllers[controller].getRawButton(id);
     }
+    public boolean bDown(int id){
+        return controller1.getRawButton(id);
+    }
+
+
     public boolean bPressed(int controller, int id){
         return controllers[controller].getRawButtonPressed(id);
     }
+    public boolean bPressed(int id){
+        return controller1.getRawButtonPressed(id);
+    }
+
+
     public boolean bReleased(int controller, int id){
         return controllers[controller].getRawButtonReleased(id);
     }
+    public boolean bReleased(int id){
+        return controller1.getRawButtonReleased(id);
+    }
+
     public double axis(int controller, int id){
         return controllers[controller].getRawAxis(id);
+    }
+    public double axis(int id){
+        return controller1.getRawAxis(id);
     }
 }

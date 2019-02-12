@@ -123,23 +123,23 @@ public class Robot extends TimedRobot {
       customDrive.driveAutoPilot();
     }*/
 
-    if(oi.controller1.getRawButtonPressed(6)){
+    if(oi.bPressed(6)){
       arm.zeroEncoder();
     }
-    if (oi.controller1.getRawButtonPressed(2)){
+    if(oi.bPressed(2)){
       arm.moveToState(ArmState.INTAKING);
     }
-    if(oi.controller1.getRawButtonPressed(3)){
+    if(oi.bPressed(3)){
       arm.moveToState(ArmState.NEUTRAL);
     }
-    if(oi.controller1.getRawButtonPressed(4)){
+    if(oi.bPressed(4)){
       arm.moveToState(ArmState.CARGO);
     }
-    if(oi.controller1.getRawButtonPressed(5)){
+    if(oi.bPressed(5)){
       arm.moveToState(ArmState.FREEHAND);
     }
     //intake.intake(oi.controller1.getRawAxis(1));
-    arm.setFreehandInput(oi.controller1.getRawAxis(1));
+    arm.setFreehandInput(oi.axis(1));
 
     /*if(oi.bDown(1,1)&&oi.bDown(1,2)&&oi.bDown(1,3)&&oi.bDown(1,4)&&oi.bDown(1,5)&&oi.bDown(1,6)&&oi.bDown(1,7)&&oi.bDown(1,8)){
       forks.eatDinner();
