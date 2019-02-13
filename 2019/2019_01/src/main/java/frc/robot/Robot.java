@@ -126,17 +126,19 @@ public class Robot extends TimedRobot {
     if(oi.bPressed(6)){
       arm.zeroEncoder();
     }
-    if(oi.bPressed(2)){
-      arm.moveToState(ArmState.INTAKING);
-    }
-    if(oi.bPressed(3)){
-      arm.moveToState(ArmState.NEUTRAL);
-    }
-    if(oi.bPressed(4)){
-      arm.moveToState(ArmState.CARGO);
-    }
-    if(oi.bPressed(5)){
-      arm.moveToState(ArmState.FREEHAND);
+    if(oi.axis(3)>0.7){
+      if(oi.bPressed(2)){
+        arm.moveToState(ArmState.INTAKING);
+      }
+      if(oi.bPressed(3)){
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+      if(oi.bPressed(4)){
+        arm.moveToState(ArmState.CARGO);
+      }
+      if(oi.bPressed(5)){
+        arm.moveToState(ArmState.FREEHAND);
+      }
     }
     //intake.intake(oi.controller1.getRawAxis(1));
     arm.setFreehandInput(oi.axis(1));
