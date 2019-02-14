@@ -29,15 +29,15 @@ public class Constants {
     }
 
     //ARM CONSTANTS
-    public static final int kArmMaster = 4;
+    public static final int kArmMaster = 2;
     public static final int kArmSlave = 4;
 
     public static final int kMaxSensorVelocity = 4;
     public static final double kGearRatio = 16;
-    public static double kArmP = 2.5;
+    public static double kArmP = 7;
     public static double kArmI = 0;
-    public static double kArmD = 0;
-    public static double kArmF = 0.388;
+    public static double kArmD = 70;
+    public static double kArmF = 0.31;
     public static final Gains kArmGains = new Gains(kArmP, kArmI, kArmD, kArmF, 0, 1);
     public static enum ArmState {
         INTAKING,
@@ -47,7 +47,8 @@ public class Constants {
         BACKHATCH,
         BACKCARGO,
         BACKINTAKING,
-        FREEHAND
+        FREEHAND,
+        TEST
     }
 
     //CLIMB CONSTANTS
@@ -66,6 +67,8 @@ public class Constants {
     public static double kVoltageRamp = 0;
     public static int kForkLeft = 8;
     public static int kForkRight = 0;
+    public static final int kTow = 0;
+    public static final int kTowOut = 0;
     public static enum ClimbState {
         ONEBOTSLOW,
         ONEBOTFAST,
@@ -74,6 +77,12 @@ public class Constants {
     }
 
     //INTAKE CONSTANTS
-    public static final int kIntakeLeft = 0;
-    public static final int kIntakeRight = 0;
+    public static final int kSparkLeft = 0;
+    public static final int kSparkRight = 0;
+    public static final int kPuck = 0;
+    public static final int kPuckOut = 0;
+    public static final int kGrab = 0;
+    public static final int kGrabOut = 0;
+    public static final int kExtendo = 0;
+    public static final int kExtendoOut = 0;
 }

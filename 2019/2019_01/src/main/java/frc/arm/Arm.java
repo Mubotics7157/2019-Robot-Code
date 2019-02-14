@@ -15,7 +15,8 @@ public class Arm {
 	VictorSPX slave;
 	ArmState curArmState = ArmState.FREEHAND;
 	double setpoint = 111;
-	double input = 0;
+	double input = 0;//2572
+	int limit = -38336;
 
     public void init() {
         master = new TalonSRX(2);
@@ -50,8 +51,12 @@ public class Arm {
 		master.config_kD(Constants.kSlotIdx, Constants.kArmGains.kD, Constants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		master.configMotionCruiseVelocity(1318, Constants.kTimeoutMs);
-		master.configMotionAcceleration(1977, Constants.kTimeoutMs);
+		master.configMotionCruiseVelocity(2572, Constants.kTimeoutMs);
+		master.configMotionAcceleration(2572, Constants.kTimeoutMs);
+		master.configForwardSoftLimitEnable(true);
+		master.configForwardSoftLimitThreshold(0, Constants.kTimeoutMs);
+		master.configReverseSoftLimitEnable(true);
+		master.configReverseSoftLimitThreshold(limit, Constants.kTimeoutMs);
     }
 
     public void periodic(){
@@ -62,33 +67,51 @@ public class Arm {
 			setpoint = -90;
 			break;
 			case INTAKING:
-			setpoint = 0;
+			setpoint = 10;
 			break;
 			case BACKINTAKING:
-			setpoint = -180;
+			setpoint = -190;
 			break;
 			case CARGO:
+			setpoint = -40;
 			break;
 			case BACKCARGO:
+			setpoint = -120;
 			break;
 			case HATCH:
+			setpoint = 0;
 			break;
 			case BACKHATCH:
+			setpoint = -180;
 			break;
 			case FREEHAND:
 			break;
+			case TEST:
+			setpoint = 0;
+			break;
 		}
 		double targetPos = setpoint * Constants.kSensorUnits * Constants.kGearRatio / 360;
-		double arbFeedForward = 1;//Math.cos(master.getSelectedSensorPosition()*Constants.kArmF);
+		double armAngle = master.getSelectedSensorPosition()/Constants.kSensorUnits/Constants.kGearRatio*360;
+		double arbFeedForward = getFeedForward(armAngle);
 		SmartDashboard.putNumber("targetPOS", targetPos);
 		SmartDashboard.putNumber("setpoint", setpoint);
+		SmartDashboard.putNumber("armAngle", armAngle);
+		SmartDashboard.putNumber("motorOutputPercent", master.getMotorOutputPercent());
 		printEncoder();
 		if(curArmState == ArmState.FREEHAND){
 			master.set(ControlMode.PercentOutput, input);
 		}else{
-			master.set(ControlMode.MotionMagic, targetPos);
-			
-		}
+			master.set(ControlMode.MotionMagic, targetPos, DemandType.ArbitraryFeedForward, arbFeedForward);
+		}/*else{
+			master.set(ControlMode.MotionMagic, targetPos, DemandType.ArbitraryFeedForward, arbFeedForward);
+		}*/
+	}
+	public double getFeedForward(double angle){
+		return Math.cos(angle)*0.086;
+	}
+	public void toggleLimits(boolean bool){
+		master.configForwardSoftLimitEnable(bool);
+		master.configForwardSoftLimitEnable(bool);
 	}
 	public void printEncoder(){
 		SmartDashboard.putNumber("Master Encoder", master.getSelectedSensorPosition());

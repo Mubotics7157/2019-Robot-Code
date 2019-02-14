@@ -105,6 +105,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     processInputs();
+    //arm.moveToState(ArmState.FREEHAND);
     arm.periodic();
   }
 
@@ -113,6 +114,20 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+  }
+  public void processInputsTest(){
+
+    //intake.intake(oi.axis(3));
+
+    if(oi.bPressed(1)){
+      //intake.toggleExtend();
+    }
+    if(oi.bPressed(2)){
+      //intake.toggleIntake();
+    }
+    if(oi.bPressed(3)){
+      //intake.togglePuck();
+    }
   }
 
   public void processInputs(){
@@ -123,18 +138,39 @@ public class Robot extends TimedRobot {
       customDrive.driveAutoPilot();
     }*/
 
+   
     if(oi.bPressed(6)){
       arm.zeroEncoder();
     }
-    if(oi.axis(3)>0.7){
-      if(oi.bPressed(2)){
+    if(Math.abs(oi.axis(1))>0.3){
+      arm.moveToState(ArmState.FREEHAND);
+    }
+    if(oi.axis(2)>0.7){
+      if(oi.bPressed(1)){
         arm.moveToState(ArmState.INTAKING);
       }
+      if(oi.bPressed(2)){
+        arm.moveToState(ArmState.HATCH);
+      }
       if(oi.bPressed(3)){
-        arm.moveToState(ArmState.NEUTRAL);
+        arm.moveToState(ArmState.CARGO);
       }
       if(oi.bPressed(4)){
-        arm.moveToState(ArmState.CARGO);
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+    }
+    if(oi.axis(3)>0.7){
+      if(oi.bPressed(1)){
+        arm.moveToState(ArmState.BACKINTAKING);
+      }
+      if(oi.bPressed(2)){
+        arm.moveToState(ArmState.BACKHATCH);//-30
+      }
+      if(oi.bPressed(3)){
+        arm.moveToState(ArmState.BACKCARGO);//
+      }
+      if(oi.bPressed(4)){
+        arm.moveToState(ArmState.NEUTRAL);
       }
       if(oi.bPressed(5)){
         arm.moveToState(ArmState.FREEHAND);

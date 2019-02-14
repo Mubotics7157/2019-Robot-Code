@@ -3,6 +3,8 @@ package frc.climb;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -13,6 +15,8 @@ public class ClimbMechanism{
     WPI_TalonSRX backLeft; 
     WPI_TalonSRX frontRight;
     WPI_TalonSRX backRight;
+    DoubleSolenoid tow;
+    boolean towOut;
     AHRS navx;
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
@@ -21,6 +25,8 @@ public class ClimbMechanism{
     ClimbState curClimbState;
 
     public void init() {
+        towOut = false;
+        tow = new DoubleSolenoid(Constants.kTow, Constants.kTowOut);
         frontLeft = new WPI_TalonSRX(Constants.kClimbFrontLeft);
         backLeft = new WPI_TalonSRX(Constants.kClimbBackLeft);
         frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
@@ -45,8 +51,17 @@ public class ClimbMechanism{
         backRight.configOpenloopRamp(Constants.kVoltageRamp);
         backRight.configClosedloopRamp(Constants.kVoltageRamp);
     }
+    public void toggleTow(){
+        if(towOut = false){
+            tow.set(Value.kForward);
+            towOut = true;
+        }else{
+            tow.set(Value.kReverse);
+            towOut = false;
+        }
+    }
 
-    void climb(double driveSpeed){
+    public void climb(double driveSpeed){
         switch(curClimbState){
             case ONEBOTFAST:
             driveSpeed = 0.8;
