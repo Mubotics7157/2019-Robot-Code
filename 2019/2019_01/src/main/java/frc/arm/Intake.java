@@ -35,7 +35,7 @@ public class Intake {
         grab = new DoubleSolenoid(Constants.kGrab, Constants.kGrabOut);
         //puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
     }
-    public void togglePuck(){
+    public void toggleExpandMandibles(){
         if(puckOut==false){
             puck.set(Value.kForward);
             puckOut = true;

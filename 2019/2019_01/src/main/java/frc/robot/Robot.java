@@ -44,10 +44,10 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    arm.init();
+    //arm.init();
     //customDrive.init();
     //customDrive.initTracking();
-    //climb.init();
+    climb.init();
     //intake.init();
     //forks.init();
   }
@@ -104,9 +104,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    processInputs();
+    processInputsClimb();
+    SmartDashboard.putNumber("Pitch", climb.navx.getPitch());
+    SmartDashboard.putBoolean("isConnected", climb.navx.isConnected());
+    SmartDashboard.putBoolean("isCalibrating", climb.navx.isCalibrating());
+    SmartDashboard.putNumber("Roll", climb.navx.getRoll());
+    
     //arm.moveToState(ArmState.FREEHAND);
-    arm.periodic();
+    //arm.periodic();
   }
 
   /**
@@ -115,22 +120,83 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
+  public void teleopInit(){
+
+  }
+  public void processInputsTest2(){
+    arm.setFreehandInput(oi.axis(1));
+  }
   public void processInputsTest(){
-
-    //intake.intake(oi.axis(3));
-
-    if(oi.bPressed(1)){
-      //intake.toggleExtend();
-    }
-    if(oi.bPressed(2)){
-      //intake.toggleIntake();
-    }
-    if(oi.bPressed(3)){
-      //intake.togglePuck();
+    if(oi.axis(2)>0.7){
+      climb.manualClimb(oi.axis(1));
+    }else{
+      climb.manualClimb(0);
     }
   }
+  public void processInputsArcade(){
+    if(oi.bPressed(10)){
+      arm.zeroEncoder();
+    }
 
-  public void processInputs(){
+    if(oi.axis(2)>0.7){
+      if(oi.bPressed(2)){
+        arm.moveToState(ArmState.INTAKING);
+      }
+      if(oi.bPressed(3)){
+        arm.moveToState(ArmState.HATCH);
+      }
+      if(oi.bPressed(8)){
+        arm.moveToState(ArmState.CARGO);
+      }
+      if(oi.bPressed(7)){
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+    }
+
+    if(oi.axis(3)>0.7){
+      if(oi.bPressed(1)){
+        arm.moveToState(ArmState.BACKINTAKING);
+      }
+      if(oi.bPressed(4)){
+        arm.moveToState(ArmState.BACKHATCH);
+      }
+      if(oi.bPressed(6)){
+        arm.moveToState(ArmState.BACKCARGO);
+      }
+      if(oi.bPressed(5)){
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+    }
+
+  }
+  public void processInputsClimb(){
+    if(oi.axis(3)>0.7){
+      if(oi.bDown(1)){
+        climb.manualClimb(0, oi.axis(1)); //frontLeft
+      }
+      if(oi.bDown(2)){
+        climb.manualClimb(1, oi.axis(1)); //backLeft
+      }
+      if(oi.bDown(3)){
+        climb.manualClimb(2, oi.axis(1)); //frontRight
+      }
+      if(oi.bDown(4)){
+        climb.manualClimb(3, oi.axis(1)); //backRight
+      }
+    }
+    if(oi.axis(2)>0.7){
+      climb.manualClimb(oi.axis(1));
+    }
+    if(oi.axis(2)<0.7 && oi.axis(3)<0.7){
+      climb.manualClimb(0);
+    }
+    if(oi.bDown(5) && oi.bDown(6)){
+      climb.climb(0.6);
+    }
+    //climb.manualClimb(oi.axis(1));
+  }
+
+  public void processInputsGamepad(){
     /*switch(customDrive.curDriveState){
       case MANUAL:
       customDrive.drive(oi.axis(1,1), oi.axis(2,1));
@@ -138,6 +204,7 @@ public class Robot extends TimedRobot {
       customDrive.driveAutoPilot();
     }*/
 
+    //forks.setServo(oi.axis(5));
    
     if(oi.bPressed(6)){
       arm.zeroEncoder();

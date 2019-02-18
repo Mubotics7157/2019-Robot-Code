@@ -30,6 +30,11 @@ public class OI{
         return controller1.getRawButton(id);
     }
 
+    
+    public int getPOV(){
+        return controller1.getPOV();
+    }
+
 
     public boolean bPressed(int controller, int id){
         switch(controller){

@@ -13,23 +13,50 @@ import frc.robot.Constants;
 //forks class omegalul
 
 public class Forks {
-    Servo forkL;
-    Servo forkR;
+    Servo forkLFront;
+    Servo forkLBack;
+    Servo forkRFront;
+    Servo forkRBack;
+    double position = 0;
     public void init(){
-        forkL = new Servo(Constants.kForkLeft);
-        forkR = new Servo(Constants.kForkRight);
+        forkLFront = new Servo(Constants.kForkLFront);
+        forkLBack = new Servo(Constants.kForkLBack);
+        forkRFront = new Servo(Constants.kForkRFront);
+        forkRBack = new Servo(Constants.kForkRBack);
+    }
+    public void setForks(double pos){
+        forkLFront.set(pos);
+        forkLBack.set(pos);
+        forkRFront.set(pos);
+        forkRBack.set(pos);
+    }
+    public void setLeft(double pos){
+        forkLFront.set(pos);
+        forkLBack.set(pos);
+    }
+    public void setRight(double pos){
+        forkRFront.set(pos);
+        forkRFront.set(pos);
     }
     public void drop(){
-        forkL.set(1);
-        forkR.set(1);
+        setForks(Constants.kReleasePos);
     }
     public void reset(){
-        forkL.set(0);
-        forkR.set(0);
+        setForks(Constants.kResetPos);
+    }
+    public void expand(){
+        setLeft(Constants.kExpandPos);
+        setRight(-Constants.kExpandPos);
+    }
+    public void setServo(double delta){
+        position = position + delta;
+        forkLFront.set(delta);
+        //forkL.set
     }
 
     public void eatDinner(){
         System.out.println("mmmm so delicious...");
+        System.out.println("weef bellington for dinner");
     }
 }
 

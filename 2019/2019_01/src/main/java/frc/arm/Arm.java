@@ -6,21 +6,26 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm {
     TalonSRX master;
-	VictorSPX slave;
+	TalonSRX slave;
+	DigitalInput frontSwitch;
+	DigitalInput backSwitch;
 	ArmState curArmState = ArmState.FREEHAND;
 	double setpoint = 111;
-	double input = 0;//2572
-	int limit = -38336;
+	double input = 0;
+	int farLimit = -38336;
+	int nearLimit = 0;
 
     public void init() {
-        master = new TalonSRX(2);
-        slave = new VictorSPX(4);
+        master = new TalonSRX(Constants.kArmMaster);
+		slave = new TalonSRX(Constants.kArmSlave);
+		//frontSwitch = new DigitalInput(Constants.kSwitchFront);
+		//backSwitch = new DigitalInput(Constants.kSwitchBack);
+		
         slave.follow(master);
         /**
 		 * Configure Talon SRX Output and Sesnor direction accordingly
@@ -53,10 +58,10 @@ public class Arm {
 		/* Set acceleration and vcruise velocity - see documentation */
 		master.configMotionCruiseVelocity(2572, Constants.kTimeoutMs);
 		master.configMotionAcceleration(2572, Constants.kTimeoutMs);
-		master.configForwardSoftLimitEnable(true);
+		master.configForwardSoftLimitEnable(false);
 		master.configForwardSoftLimitThreshold(0, Constants.kTimeoutMs);
-		master.configReverseSoftLimitEnable(true);
-		master.configReverseSoftLimitThreshold(limit, Constants.kTimeoutMs);
+		master.configReverseSoftLimitEnable(false);
+		master.configReverseSoftLimitThreshold(farLimit, Constants.kTimeoutMs);
     }
 
     public void periodic(){
@@ -70,7 +75,7 @@ public class Arm {
 			setpoint = 10;
 			break;
 			case BACKINTAKING:
-			setpoint = -190;
+			setpoint = -160;
 			break;
 			case CARGO:
 			setpoint = -40;
@@ -82,7 +87,7 @@ public class Arm {
 			setpoint = 0;
 			break;
 			case BACKHATCH:
-			setpoint = -180;
+			setpoint = -150;
 			break;
 			case FREEHAND:
 			break;

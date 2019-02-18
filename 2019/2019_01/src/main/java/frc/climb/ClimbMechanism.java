@@ -1,47 +1,63 @@
 package frc.climb;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Gains;
 import frc.robot.Constants.ClimbState;
 
 public class ClimbMechanism{
-    WPI_TalonSRX frontLeft; 
-    WPI_TalonSRX backLeft; 
-    WPI_TalonSRX frontRight;
-    WPI_TalonSRX backRight;
+    TalonSRX frontLeft; 
+    TalonSRX backLeft; 
+    TalonSRX frontRight;
+    TalonSRX backRight;
+
     DoubleSolenoid tow;
     boolean towOut;
-    AHRS navx;
+    public AHRS navx = new AHRS(SPI.Port.kMXP);
+
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
     double integralError = 0;
     double integralErrorR = 0;
+
     ClimbState curClimbState;
+    Gains currentGains;
 
     public void init() {
-        towOut = false;
-        tow = new DoubleSolenoid(Constants.kTow, Constants.kTowOut);
+        //towOut = false;
+        //tow = new DoubleSolenoid(Constants.kTow, Constants.kTowOut);
         frontLeft = new WPI_TalonSRX(Constants.kClimbFrontLeft);
         backLeft = new WPI_TalonSRX(Constants.kClimbBackLeft);
         frontRight = new WPI_TalonSRX(Constants.kClimbFrontRight);
         backRight = new WPI_TalonSRX(Constants.kClimbBackRight);
-        navx = new AHRS(Port.kMXP);
-        curClimbState = ClimbState.TWOBOTFAST;
+
+        frontLeft.setInverted(true);
+        backLeft.setInverted(true);
+        frontRight.setInverted(true);
+        backRight.setInverted(true);
+
+        frontLeft.clearStickyFaults();
+        backLeft.clearStickyFaults();
+        frontRight.clearStickyFaults();
+        backLeft.clearStickyFaults();
+
+        curClimbState = ClimbState.SEXYMODE;
+
         SmartDashboard.putNumber("kP", 0);
         SmartDashboard.putNumber("kI", 0);
         SmartDashboard.putNumber("kD", 0);
-        SmartDashboard.putNumber("driveSpeed", 0);
         SmartDashboard.putNumber("kPR", 0);
         SmartDashboard.putNumber("kIR", 0);
         SmartDashboard.putNumber("kDR", 0);
-        SmartDashboard.putNumber("voltageRamp", 0);
-        Constants.kVoltageRamp = SmartDashboard.getNumber("voltageRamp", 0);
+
         frontLeft.configOpenloopRamp(Constants.kVoltageRamp);
         frontLeft.configClosedloopRamp(Constants.kVoltageRamp);
         frontRight.configOpenloopRamp(Constants.kVoltageRamp);
@@ -60,20 +76,33 @@ public class ClimbMechanism{
             towOut = false;
         }
     }
+    public void manualClimb(int talon, double driveSpeed){
+        //talons[talon].set(ControlMode.PercentOutput, driveSpeed);
+        switch(talon){
+            case 0: frontLeft.set(ControlMode.PercentOutput, driveSpeed);
+            break;
+            case 1: frontRight.set(ControlMode.PercentOutput, driveSpeed);
+            break;
+            case 2: backLeft.set(ControlMode.PercentOutput, driveSpeed);
+            break;
+            case 3: backRight.set(ControlMode.PercentOutput, driveSpeed);
+            break;
+        }
+    }
+    public void manualClimb(double driveSpeed){
+        frontLeft.set(ControlMode.PercentOutput, -driveSpeed);
+        frontRight.set(ControlMode.PercentOutput, -driveSpeed);
+        backLeft.set(ControlMode.PercentOutput, -driveSpeed);
+        backRight.set(ControlMode.PercentOutput, -driveSpeed);
+    }
 
     public void climb(double driveSpeed){
         switch(curClimbState){
-            case ONEBOTFAST:
-            driveSpeed = 0.8;
-            break;
-            case ONEBOTSLOW:
-            driveSpeed = 0.6;
-            break;
             case TWOBOTFAST:
-            driveSpeed = 0.8;
+            currentGains = Constants.flexMode;
             break;
-            case TWOBOTSLOW:
-            driveSpeed = 0.6;
+            case SEXYMODE:
+            currentGains = Constants.sexyMode;
             break;
         }
         error = navx.getPitch();
@@ -83,21 +112,24 @@ public class ClimbMechanism{
         deltaError = error-lastError;
         deltaErrorR = errorR - lastErrorR;
 
-        double P = error*Constants.kPitchP;
-        double D = Constants.kPitchD*deltaError;
-        double I = Constants.kPitchI*integralError;
+        SmartDashboard.putNumber("kP", currentGains.kP);
+        SmartDashboard.putNumber("kD", currentGains.kD);
 
-        double PR = errorR*Constants.kRollP;
-        double DR = Constants.kRollD*deltaErrorR;
-        double IR = Constants.kRollI*integralErrorR;
+        double P = error*currentGains.kP;
+        double D = currentGains.kD*deltaError;
+        double I = currentGains.kI*integralError;
 
-        double gain = Math.abs(error)>0.1 ? P+I+D : 0;
-        double gainR = Math.abs(errorR)>0.1 ? PR+IR+DR : 0;
+        double PR = errorR*currentGains.kP;
+        double DR = currentGains.kD*deltaErrorR;
+        double IR = currentGains.kI*integralErrorR;
 
-        frontLeft.set(driveSpeed-gain-gainR);
-        backLeft.set(driveSpeed-gain+gainR);
-        frontRight.set(driveSpeed+gain-gainR);
-        backRight.set(driveSpeed+gain+gainR);
+        double gain = Math.abs(error)>1 ? P+I+D : 0;
+        double gainR = Math.abs(errorR)>1 ? PR+IR+DR : 0;
+
+        frontLeft.set(ControlMode.PercentOutput, driveSpeed-gain-gainR);
+        backLeft.set(ControlMode.PercentOutput, driveSpeed-gain+gainR);
+        frontRight.set(ControlMode.PercentOutput, driveSpeed+gain-gainR);
+        backRight.set(ControlMode.PercentOutput, driveSpeed+gain+gainR);
 
         integralError = integralError + (error*0.2);  
         lastError = error;
