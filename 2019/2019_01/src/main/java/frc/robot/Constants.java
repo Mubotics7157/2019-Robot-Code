@@ -34,13 +34,16 @@ public class Constants {
     public static final int kArmMaster = 31;
     public static final int kArmSlave = 32;
 
+    public static final int kTow = 0;
+
     public static final int kMaxSensorVelocity = 4;
     public static final double kGearRatio = 16;
-    public static double kArmP = 7;
+    public static double kArmP = 10;
     public static double kArmI = 0;
-    public static double kArmD = 70;
-    public static double kArmF = 0.31;
+    public static double kArmD = 0;
+    public static double kArmF = 10.23;
     public static final Gains kArmGains = new Gains(kArmP, kArmI, kArmD, kArmF, 0, 1);
+    public static final int kAllowableError = 0;
     public static enum ArmState {
         INTAKING,
         HATCH,
@@ -50,6 +53,7 @@ public class Constants {
         BACKCARGO,
         BACKINTAKING,
         FREEHAND,
+        TOW,
         TEST
     }
 
@@ -58,19 +62,24 @@ public class Constants {
     public static final int kClimbFrontRight = 2;
     public static final int kClimbBackLeft = 3;
     public static final int kClimbBackRight = 4;
+
     public static double kPitchP = 0.1;
     public static double kPitchI = 0;
     public static double kPitchD = 0;
     public static double kPitchF = 0;
+
     public static double kRollP = 0.07;
     public static double kRollI = 0;
     public static double kRollD = 0;
     public static double kRollF = 0;
+
     public static double kVoltageRamp = 0.2;
-    public static final int kTow = 0;
-    public static final int kTowOut = 0;
-    public static final Gains sexyMode = new Gains(0.2, 0, 20, 0, 0.9);
+
+    public static final Gains sexyMode = new Gains(0.25, 0, 0.15, 0, 0.9);
     public static final Gains flexMode = new Gains(0.2, 0, 2, 0, 0.8);
+    public static final Gains backwards = new Gains(0.2, 0, 20, 0, -0.8);
+    public static final Gains stayMode = new Gains(0.1, 0, 0, 0, 0);
+
     public static enum ClimbState {
         ONEBOTSLOW,
         ONEBOTFAST,
@@ -82,18 +91,22 @@ public class Constants {
     //INTAKE CONSTANTS
     public static final int kSparkLeft = 0;
     public static final int kSparkRight = 0;
-    public static final int kPuck = 0;
-    public static final int kPuckOut = 0;
+
+    public static final int kPuck = 2;
+    public static final int kPuckOut = 3;
+
     public static final int kGrab = 0;
-    public static final int kGrabOut = 0;
-    public static final int kExtendo = 0;
-    public static final int kExtendoOut = 0;
+    public static final int kGrabOut = 1;
+
+    public static final int kExtendo = 6;
+    public static final int kExtendoOut = 7;
 
     //FORK CONSTANTS
     public static int kForkLFront = 8;
     public static int kForkLBack = 0;
     public static int kForkRFront = 0;
     public static int kForkRBack = 0;
+
     public static int kResetPos = 0;
     public static int kExpandPos = 0;
     public static int kReleasePos = 0;

@@ -7,6 +7,7 @@
 
 package frc.arm;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -24,6 +25,7 @@ public class Intake {
     boolean intakeOut;
     boolean intakeClosed;
     boolean puckOut;
+    Compressor compressor;
 
     public void init(){
         intakeOut = false;
@@ -31,9 +33,11 @@ public class Intake {
         puckOut = false;
         //sparkLeft = new Spark(Constants.kSparkLeft);
         //sparkRight = new Spark(Constants.kSparkRight);
-        //extendo = new DoubleSolenoid(Constants.kExtendo, Constants.kExtendoOut);
+        extendo = new DoubleSolenoid(Constants.kExtendo, Constants.kExtendoOut);
         grab = new DoubleSolenoid(Constants.kGrab, Constants.kGrabOut);
-        //puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
+        puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
+        compressor = new Compressor();
+        //compressor.stop();
     }
     public void toggleExpandMandibles(){
         if(puckOut==false){

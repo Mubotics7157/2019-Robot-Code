@@ -20,7 +20,6 @@ public class CustomDrive{
     CANSparkMax rightSpark2;
     CANPIDController left;
     CANPIDController right;
-    DifferentialDrive drive;
     public DriveState curDriveState;
 
     double kPl = 0, kIl = 0, kDl = 0, kFl = 0, kFFl = 0;
@@ -35,7 +34,6 @@ public class CustomDrive{
         rightSpark2 = new CANSparkMax(21, MotorType.kBrushless);
         right = new CANPIDController(rightSpark);
         rightSpark2.follow(rightSpark);
-        drive = new DifferentialDrive(leftSpark, rightSpark);
         curDriveState = DriveState.MANUAL;
         //initPID();
     } 
@@ -57,7 +55,8 @@ public class CustomDrive{
     }
 
     public void drive(double lSpeed, double rSpeed){
-        drive.tankDrive(lSpeed, rSpeed);
+        leftSpark.set(Math.abs(lSpeed) > 0.02 ? lSpeed : 0);
+        rightSpark.set(Math.abs(rSpeed) > 0.02 ? rSpeed : 0);
     }
 
     public void printEncoders(){

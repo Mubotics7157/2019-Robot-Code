@@ -13,6 +13,7 @@ import frc.climb.ClimbMechanism;
 import frc.climb.Forks;
 import frc.drive.CustomDrive;
 import frc.robot.Constants.ArmState;
+import frc.robot.Constants.ClimbState;
 import frc.arm.Arm;
 import frc.arm.Intake;
 
@@ -44,11 +45,11 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    //arm.init();
-    //customDrive.init();
-    //customDrive.initTracking();
+    arm.init();
+    customDrive.init();
+    customDrive.initTracking();
     climb.init();
-    //intake.init();
+    intake.init();
     //forks.init();
   }
 
@@ -104,14 +105,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    processInputsClimb();
+    processInputsFinal();
     SmartDashboard.putNumber("Pitch", climb.navx.getPitch());
     SmartDashboard.putBoolean("isConnected", climb.navx.isConnected());
     SmartDashboard.putBoolean("isCalibrating", climb.navx.isCalibrating());
     SmartDashboard.putNumber("Roll", climb.navx.getRoll());
     
     //arm.moveToState(ArmState.FREEHAND);
-    //arm.periodic();
+    arm.periodic();
   }
 
   /**
@@ -121,10 +122,83 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
   public void teleopInit(){
-
+    arm.moveToState(ArmState.FREEHAND);
+  }
+  public void processInputsFinalClimb(){
+    if(oi.bDown(8)){
+      climb.climb(0);
+    }
+    arm.setTow(oi.axis(2));
+    if(oi.bDown(5)){
+      climb.manualClimb(0, oi.axis(1));
+      climb.manualClimb(1, oi.axis(1));
+    }else{
+      climb.manualClimb(0, 0);
+      climb.manualClimb(1, 0);
+    }
+    if(oi.bDown(6)){
+      climb.manualClimb(2, oi.axis(1));
+      climb.manualClimb(3, oi.axis(1));
+    }else{
+      climb.manualClimb(2, 0);
+      climb.manualClimb(3, 0);
+    }
+    if(oi.bDown(5)==false && oi.bDown(6)==false){
+      customDrive.drive(oi.axis(1), oi.axis(5));
+    }
+  }
+  public void processInputsFinal(){
+    arm.setFreehandInput(oi.axis(1));
+    arm.setTowInput(oi.axis(1));
+    if(oi.axis(1)>0.2){
+      arm.moveToState(ArmState.FREEHAND);
+    }
+    if(oi.axis(2)>0.7){
+      if(arm.getArmAngle()>-90){
+        if(oi.bPressed(1)){
+          arm.moveToState(ArmState.INTAKING);
+        }
+        if(oi.bPressed(2)){
+          arm.moveToState(ArmState.HATCH);
+        }
+        if(oi.bPressed(3)){
+          arm.moveToState(ArmState.CARGO);
+        }
+        if(oi.bPressed(4)){
+          arm.moveToState(ArmState.NEUTRAL);
+        }
+      }
+      if(arm.getArmAngle()<-90){
+        if(oi.bPressed(1)){
+          arm.moveToState(ArmState.BACKINTAKING);
+        }
+        if(oi.bPressed(2)){
+          arm.moveToState(ArmState.BACKHATCH);
+        }
+        if(oi.bPressed(3)){
+          arm.moveToState(ArmState.BACKCARGO);
+        }
+        if(oi.bPressed(4)){
+          arm.moveToState(ArmState.NEUTRAL);
+        }
+        if(oi.bPressed(5)){
+          arm.moveToState(ArmState.FREEHAND);
+        }
+      }
+    }
   }
   public void processInputsTest2(){
-    arm.setFreehandInput(oi.axis(1));
+    //customDrive.drive(oi.axis(1), oi.axis(5));
+    if(oi.bPressed(1)){
+      intake.toggleExpandMandibles();
+    }
+    if(oi.bPressed(2)){
+      intake.toggleExtend();
+    }
+    if(oi.bPressed(3)){
+      intake.toggleIntake();
+    }
+    arm.printArmAngle();
   }
   public void processInputsTest(){
     if(oi.axis(2)>0.7){
@@ -190,8 +264,19 @@ public class Robot extends TimedRobot {
     if(oi.axis(2)<0.7 && oi.axis(3)<0.7){
       climb.manualClimb(0);
     }
+    
     if(oi.bDown(5) && oi.bDown(6)){
+      climb.setClimbState(ClimbState.SEXYMODE);
       climb.climb(0.6);
+    }else if(oi.bDown(5)){
+      climb.setClimbState(ClimbState.TWOBOTSLOW);
+      climb.climb(0);
+    }
+    if(oi.bPressed(8)){
+      climb.setClimbState(ClimbState.SEXYMODE);
+    }
+    if(oi.bPressed(9)){
+      climb.setClimbState(ClimbState.TWOBOTSLOW);
     }
     //climb.manualClimb(oi.axis(1));
   }
@@ -245,6 +330,7 @@ public class Robot extends TimedRobot {
     }
     //intake.intake(oi.controller1.getRawAxis(1));
     arm.setFreehandInput(oi.axis(1));
+    arm.setTowInput(oi.axis(1));
 
     /*if(oi.bDown(1,1)&&oi.bDown(1,2)&&oi.bDown(1,3)&&oi.bDown(1,4)&&oi.bDown(1,5)&&oi.bDown(1,6)&&oi.bDown(1,7)&&oi.bDown(1,8)){
       forks.eatDinner();
