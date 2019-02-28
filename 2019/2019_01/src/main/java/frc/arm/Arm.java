@@ -15,12 +15,10 @@ public class Arm {
 	TalonSRX slave;
 
 	Spark tow;
-	DigitalInput frontSwitch;
-	DigitalInput backSwitch;
 
 	ArmState curArmState = ArmState.FREEHAND;
 	
-	double setpoint = 111;
+	double setpoint = 0;
 	double input = 0;
 	double towInput = 0;
 

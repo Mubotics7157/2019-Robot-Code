@@ -37,8 +37,9 @@ public class Intake {
         grab = new DoubleSolenoid(Constants.kGrab, Constants.kGrabOut);
         puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
         compressor = new Compressor();
-        //compressor.stop();
+        compressor.stop();
     }
+
     public void toggleExpandMandibles(){
         if(puckOut==false){
             puck.set(Value.kForward);

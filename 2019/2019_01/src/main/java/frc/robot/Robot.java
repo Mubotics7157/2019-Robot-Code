@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.climb.ClimbMechanism;
 import frc.climb.Forks;
+import frc.climb.SolenoidForks;
 import frc.drive.CustomDrive;
 import frc.robot.Constants.ArmState;
 import frc.robot.Constants.ClimbState;
+import frc.robot.Constants.DriveState;
 import frc.arm.Arm;
 import frc.arm.Intake;
 
@@ -36,6 +38,7 @@ public class Robot extends TimedRobot {
   public Arm arm = new Arm();
   public Intake intake = new Intake();
   public Forks forks = new Forks();
+  public SolenoidForks solForks = new SolenoidForks();
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -105,14 +108,41 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    processInputsFinal();
+    int selected = 0;
+
     SmartDashboard.putNumber("Pitch", climb.navx.getPitch());
     SmartDashboard.putBoolean("isConnected", climb.navx.isConnected());
     SmartDashboard.putBoolean("isCalibrating", climb.navx.isCalibrating());
     SmartDashboard.putNumber("Roll", climb.navx.getRoll());
+    /*if(oi.bPressed(7)){
+      switch(selected){
+        case 0:
+        selected = 1;
+        System.out.println("Selected: Arm");
+        case 1:
+        selected = 2;
+        System.out.println("Selected: Climb");
+        case 2:
+        selected = 0;
+        System.out.println("Selected: Drive");
+      }
+    }
     
+    switch(selected){
+      case 0:
+      processInputsFinalDrive();
+      SmartDashboard.putString("selected", "Drive");
+      case 1:
+      processInputsFinalArm();
+      SmartDashboard.putString("selected", "Arm");
+      case 2:
+      processInputsFinalClimb();
+      SmartDashboard.putString("selected", "Climb");
+    }*/
     //arm.moveToState(ArmState.FREEHAND);
-    arm.periodic();
+    //arm.periodic();
+    //test();
+    finalControlScheme();
   }
 
   /**
@@ -123,6 +153,103 @@ public class Robot extends TimedRobot {
   }
   public void teleopInit(){
     arm.moveToState(ArmState.FREEHAND);
+  }
+  public void finalControlScheme(){
+    //controller 0 = arcade
+    //controller 1 = flight
+    //controller 2 = leftDrive
+    //controller 3 = rightDrive
+
+    //BEFORE DRIVING CHECK CONTROLLER AXIS FOR DRIVE STICKS!!!
+
+    //ARM + HATCH INTAKE
+    if(Math.abs(oi.axis(1, 1))>0.2){
+      arm.moveToState(ArmState.FREEHAND);
+    }
+    if(arm.getArmAngle()>-90){
+      if(oi.bPressed(1, 2)){
+        arm.moveToState(ArmState.HATCH);
+      }
+      if(oi.bPressed(1, 4)){
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+    }else if(arm.getArmAngle()<-90){
+      if(oi.bPressed(1, 2)){
+        arm.moveToState(ArmState.BACKHATCH);
+      }
+      if(oi.bPressed(1, 4)){
+        arm.moveToState(ArmState.NEUTRAL);
+      }
+    }
+
+    if(oi.bPressed(1, 1)){
+      intake.toggleExpandMandibles();
+    }
+
+    //CLIMB
+
+    if(oi.bPressed(1, 5)){
+      //climbs with pid
+      climb.setClimbState(ClimbState.SEXYMODE);
+      climb.climb(0);
+    }
+
+    if(oi.bDown(5)){
+      //brings up front racks
+      climb.manualClimb(0, oi.axis(1));
+      climb.manualClimb(1, oi.axis(1));
+    }else{
+      //stops racks from moving during idle
+      climb.manualClimb(0, 0);
+      climb.manualClimb(1, 0);
+    }
+    if(oi.bDown(6)){
+      //brings up back racks
+      climb.manualClimb(2, oi.axis(1));
+      climb.manualClimb(3, oi.axis(1));
+    }else{
+      //stops racks from moving during idle
+      climb.manualClimb(2, 0);
+      climb.manualClimb(3, 0);
+    }
+
+
+    //DRIVE
+    if(oi.bPressed(2, 1)){
+      if(customDrive.curDriveState == DriveState.AUTO){
+        customDrive.curDriveState = DriveState.MANUAL;
+      }else{
+        customDrive.curDriveState = DriveState.AUTO;
+      }
+    }
+    switch(customDrive.curDriveState){
+      case AUTO:
+      customDrive.driveAutoPilot();
+      case MANUAL:
+      customDrive.drive(oi.axis(2, 1), oi.axis(3, 1));
+    }
+  }
+
+
+
+
+
+
+
+  
+  public void processInputsFinalDrive(){
+    switch(customDrive.curDriveState){
+      case AUTO:
+      customDrive.driveAutoPilot();
+      case MANUAL:
+      customDrive.drive(-oi.axis(1), oi.axis(5));
+    }
+    /*if(oi.bPressed(1) && customDrive.curDriveState==DriveState.AUTO){
+      customDrive.curDriveState = DriveState.MANUAL;
+    }else if(oi.bPressed(1) && customDrive.curDriveState==DriveState.MANUAL){
+      customDrive.curDriveState = DriveState.AUTO;
+    }*/
+
   }
   public void processInputsFinalClimb(){
     if(oi.bDown(8)){
@@ -147,7 +274,7 @@ public class Robot extends TimedRobot {
       customDrive.drive(oi.axis(1), oi.axis(5));
     }
   }
-  public void processInputsFinal(){
+  public void processInputsFinalArm(){
     arm.setFreehandInput(oi.axis(1));
     arm.setTowInput(oi.axis(1));
     if(oi.axis(1)>0.2){

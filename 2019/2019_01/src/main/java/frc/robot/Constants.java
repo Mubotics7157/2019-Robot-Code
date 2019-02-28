@@ -110,4 +110,7 @@ public class Constants {
     public static int kResetPos = 0;
     public static int kExpandPos = 0;
     public static int kReleasePos = 0;
+
+    public static int kForkIn = 0;
+    public static int kForkOut = 0;
 }

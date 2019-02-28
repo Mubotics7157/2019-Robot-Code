@@ -47,13 +47,6 @@ public class ClimbMechanism{
 
         curClimbState = ClimbState.SEXYMODE;
 
-        SmartDashboard.putNumber("kP", 0);
-        SmartDashboard.putNumber("kI", 0);
-        SmartDashboard.putNumber("kD", 0);
-        SmartDashboard.putNumber("kPR", 0);
-        SmartDashboard.putNumber("kIR", 0);
-        SmartDashboard.putNumber("kDR", 0);
-
         frontLeft.configOpenloopRamp(Constants.kVoltageRamp);
         frontLeft.configClosedloopRamp(Constants.kVoltageRamp);
 
