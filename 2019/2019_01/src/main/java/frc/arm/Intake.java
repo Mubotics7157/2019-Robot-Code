@@ -19,9 +19,9 @@ import frc.robot.Constants;
 public class Intake {
     Spark sparkLeft;
     Spark sparkRight;
-    DoubleSolenoid extendo;
-    DoubleSolenoid grab;
-    DoubleSolenoid puck;
+    public DoubleSolenoid extendo;
+    public DoubleSolenoid grab;
+    public DoubleSolenoid puck;
     boolean intakeOut;
     boolean intakeClosed;
     boolean puckOut;
@@ -31,13 +31,13 @@ public class Intake {
         intakeOut = false;
         intakeClosed = false;
         puckOut = false;
-        //sparkLeft = new Spark(Constants.kSparkLeft);
-        //sparkRight = new Spark(Constants.kSparkRight);
+        sparkLeft = new Spark(Constants.kSparkLeft);
+        sparkRight = new Spark(Constants.kSparkRight);
         extendo = new DoubleSolenoid(Constants.kExtendo, Constants.kExtendoOut);
         grab = new DoubleSolenoid(Constants.kGrab, Constants.kGrabOut);
         puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
         compressor = new Compressor();
-        compressor.stop();
+        //compressor.stop();
     }
 
     public void toggleExpandMandibles(){
@@ -57,6 +57,9 @@ public class Intake {
             grab.set(Value.kReverse);
             intakeClosed = false;
         }
+    }
+    public void setIntake(boolean bool){
+        intakeClosed = bool;
     }
     public void toggleExtend(){
         if(intakeOut==false){

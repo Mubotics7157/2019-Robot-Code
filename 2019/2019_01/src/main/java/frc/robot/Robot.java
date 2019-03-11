@@ -7,16 +7,16 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.climb.ClimbMechanism;
-import frc.climb.Forks;
-import frc.climb.SolenoidForks;
 import frc.drive.CustomDrive;
 import frc.robot.Constants.ArmState;
 import frc.robot.Constants.ClimbState;
 import frc.robot.Constants.DriveState;
 import frc.arm.Arm;
+import frc.arm.CameraManager;
 import frc.arm.Intake;
 
 /**
@@ -37,8 +37,8 @@ public class Robot extends TimedRobot {
   public ClimbMechanism climb = new ClimbMechanism();
   public Arm arm = new Arm();
   public Intake intake = new Intake();
-  public Forks forks = new Forks();
-  public SolenoidForks solForks = new SolenoidForks();
+  //public Forks forks = new Forks();
+  public CameraManager camManager = new CameraManager();
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -54,6 +54,7 @@ public class Robot extends TimedRobot {
     climb.init();
     intake.init();
     //forks.init();
+    camManager.init();
   }
 
   /**
@@ -66,6 +67,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    arm.periodic();
   }
 
   /**
@@ -92,6 +94,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    finalControlScheme();
     switch (m_autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
@@ -108,41 +111,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    int selected = 0;
-
     SmartDashboard.putNumber("Pitch", climb.navx.getPitch());
     SmartDashboard.putBoolean("isConnected", climb.navx.isConnected());
     SmartDashboard.putBoolean("isCalibrating", climb.navx.isCalibrating());
     SmartDashboard.putNumber("Roll", climb.navx.getRoll());
-    /*if(oi.bPressed(7)){
-      switch(selected){
-        case 0:
-        selected = 1;
-        System.out.println("Selected: Arm");
-        case 1:
-        selected = 2;
-        System.out.println("Selected: Climb");
-        case 2:
-        selected = 0;
-        System.out.println("Selected: Drive");
-      }
-    }
-    
-    switch(selected){
-      case 0:
-      processInputsFinalDrive();
-      SmartDashboard.putString("selected", "Drive");
-      case 1:
-      processInputsFinalArm();
-      SmartDashboard.putString("selected", "Arm");
-      case 2:
-      processInputsFinalClimb();
-      SmartDashboard.putString("selected", "Climb");
-    }*/
-    //arm.moveToState(ArmState.FREEHAND);
-    //arm.periodic();
-    //test();
+  
     finalControlScheme();
+    arm.periodic();
   }
 
   /**
@@ -154,81 +129,150 @@ public class Robot extends TimedRobot {
   public void teleopInit(){
     arm.moveToState(ArmState.FREEHAND);
   }
+
+  public void testing(){
+    if(oi.bPressed(1, 1)){
+      intake.toggleExpandMandibles();
+    }
+    if(oi.bPressed(1, 2)){
+      intake.toggleExtend();
+    }
+    if(oi.bPressed(1, 4)){
+      intake.toggleIntake();
+    }
+    if(oi.bPressed(1, 5)){
+      intake.puck.set(Value.kForward);
+    }
+    if(oi.bPressed(1, 6)){
+      intake.puck.set(Value.kReverse);
+    }
+  }
+  
   public void finalControlScheme(){
+    
     //controller 0 = arcade
     //controller 1 = flight
     //controller 2 = leftDrive
     //controller 3 = rightDrive
-
     //BEFORE DRIVING CHECK CONTROLLER AXIS FOR DRIVE STICKS!!!
 
-    //ARM + HATCH INTAKE
-    if(Math.abs(oi.axis(1, 1))>0.2){
-      arm.moveToState(ArmState.FREEHAND);
+    //CAMERA TOGGLES
+  /*
+    if(oi.bPressed(3, 2)){
+      camManager.setCamera(1);
     }
-    if(arm.getArmAngle()>-90){
+    if(oi.bPressed(3, 3)){
+      camManager.setCamera(2);
+    }
+    if(oi.bPressed(3, 4)){
+      camManager.setCamera(3);
+    }
+*/
+
+
+      if(oi.bPressed(1, 9)){
+        arm.zeroEncoder();
+      }
+      //ARM + HATCH INTAKE
+      arm.setFreehandInput(oi.axis(1, 1));
+      //arm.setTow(0);
+
+      if(oi.bPressed(1, 1)){
+        intake.toggleExpandMandibles();
+      }
       if(oi.bPressed(1, 2)){
+        intake.toggleExtend();
+      }
+      if(oi.bPressed(1, 4)){
+        intake.toggleIntake();
+      }
+
+      //arm.setTowInput(oi.axis(1, 2));
+    
+      intake.intake(oi.axis(1, 4));
+    
+      if(Math.abs(oi.axis(1, 1))>0.2){
+        arm.moveToState(ArmState.FREEHAND);
+        SmartDashboard.putNumber("Arm Input", oi.axis(1, 1));
+      }
+      
+      if(oi.bPressed(1, 6)){
         arm.moveToState(ArmState.HATCH);
       }
-      if(oi.bPressed(1, 4)){
-        arm.moveToState(ArmState.NEUTRAL);
+    
+      //CLIMB
+      
+      if(oi.axis(2)>0.2){
+        if(oi.bDown(1)){
+          climb.manualClimb(0, oi.axis(1));
+        }
+        if(oi.bDown(2)){
+          climb.manualClimb(1, oi.axis(1));
+        }
+        if(oi.bDown(3)){
+          climb.manualClimb(2, oi.axis(1));
+        }
+        if(oi.bDown(4)){
+          climb.manualClimb(3, oi.axis(1));
+        }
+      }else if(oi.axis(3)>0.2){
+        climb.manualClimb(oi.axis(1));
+      }else if(oi.bDown(8)){
+        climb.climb();
+      }else{
+        climb.manualClimb(0);
       }
-    }else if(arm.getArmAngle()<-90){
-      if(oi.bPressed(1, 2)){
-        arm.moveToState(ArmState.BACKHATCH);
+      if(oi.bDown(7)){
+        intake.setIntake(true);
+        arm.setTow(1);
+        arm.setFreehandInput(0.2);
+      }else{
+        arm.setTow(0);
       }
-      if(oi.bPressed(1, 4)){
-        arm.moveToState(ArmState.NEUTRAL);
-      }
-    }
-
-    if(oi.bPressed(1, 1)){
-      intake.toggleExpandMandibles();
-    }
-
-    //CLIMB
-
-    if(oi.bPressed(1, 5)){
-      //climbs with pid
-      climb.setClimbState(ClimbState.SEXYMODE);
-      climb.climb(0);
-    }
-
-    if(oi.bDown(5)){
-      //brings up front racks
-      climb.manualClimb(0, oi.axis(1));
-      climb.manualClimb(1, oi.axis(1));
-    }else{
-      //stops racks from moving during idle
-      climb.manualClimb(0, 0);
-      climb.manualClimb(1, 0);
-    }
-    if(oi.bDown(6)){
-      //brings up back racks
-      climb.manualClimb(2, oi.axis(1));
-      climb.manualClimb(3, oi.axis(1));
-    }else{
-      //stops racks from moving during idle
-      climb.manualClimb(2, 0);
-      climb.manualClimb(3, 0);
-    }
+     
+    
 
 
     //DRIVE
+
     if(oi.bPressed(2, 1)){
-      if(customDrive.curDriveState == DriveState.AUTO){
-        customDrive.curDriveState = DriveState.MANUAL;
-      }else{
-        customDrive.curDriveState = DriveState.AUTO;
-      }
+      customDrive.switchTarget();
     }
+
+    double deadzone = 0.2;
+    boolean justSwitched = false;
+    /*if(oi.bDown(3, 1)){
+      customDrive.curDriveState = DriveState.AUTO;
+      justSwitched = false;
+    }else if(Math.abs(oi.axis(3, 1))>deadzone || Math.abs(oi.axis(2, 1))>deadzone){
+      customDrive.curDriveState = DriveState.MANUAL;
+      if(justSwitched == false){
+        System.out.println("Manual Override");
+      }
+      justSwitched = true;
+    }*/
+
     switch(customDrive.curDriveState){
       case AUTO:
       customDrive.driveAutoPilot();
+      
       case MANUAL:
-      customDrive.drive(oi.axis(2, 1), oi.axis(3, 1));
+      customDrive.drive(-oi.axis(2, 1), oi.axis(3, 1));
+      /*if(oi.bDown(2, 1)){
+        customDrive.driveL(oi.axis(2, 1));
+      }else{
+        customDrive.driveSL(oi.axis(2, 1));
+      }
+      if(oi.bDown(3, 1)){
+        customDrive.driveR(oi.axis(3, 1));
+      }else{
+        customDrive.driveSR(oi.axis(3, 1));
+      }*/
+      
     }
   }
+
+ 
 
 
 
@@ -250,8 +294,8 @@ public class Robot extends TimedRobot {
       customDrive.curDriveState = DriveState.AUTO;
     }*/
 
-  }
-  public void processInputsFinalClimb(){
+  
+  /*public void processInputsFinalClimb(){
     if(oi.bDown(8)){
       climb.climb(0);
     }

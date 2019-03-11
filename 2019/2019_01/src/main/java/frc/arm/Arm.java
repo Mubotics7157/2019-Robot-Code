@@ -80,11 +80,11 @@ public class Arm {
 			SmartDashboard.putString("ArmState", "NEUTRAL");
 			break;
 			case INTAKING:
-			setpoint = 10;
+			setpoint = 25;
 			SmartDashboard.putString("ArmState", "INTAKING");
 			break;
 			case BACKINTAKING:
-			setpoint = -160;
+			setpoint = -170;
 			SmartDashboard.putString("ArmState", "BACKINTAKING");
 			break;
 			case CARGO:
@@ -92,7 +92,7 @@ public class Arm {
 			SmartDashboard.putString("ArmState", "CARGO");
 			break;
 			case BACKCARGO:
-			setpoint = -120;
+			setpoint = -115;
 			SmartDashboard.putString("ArmState", "BACKCARGO");
 			break;
 			case HATCH:
@@ -107,10 +107,10 @@ public class Arm {
 			SmartDashboard.putString("ArmState", "FREEHAND");
 			break;
 			case TOW:
-			setpoint = 0;
+			//setpoint = 0;
 			SmartDashboard.putString("ArmState", "TOW");
 			case TEST:
-			setpoint = 0;
+			//setpoint = 0;
 			SmartDashboard.putString("ArmState", "TEST");
 			break;
 		}

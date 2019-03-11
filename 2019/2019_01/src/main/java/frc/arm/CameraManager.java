@@ -23,15 +23,7 @@ public class CameraManager {
     public void init(){
         camera1 = CameraServer.getInstance().startAutomaticCapture(0);
         camera2 = CameraServer.getInstance().startAutomaticCapture(1);
-        camera3 = CameraServer.getInstance().startAutomaticCapture(2);
-        server = CameraServer.getInstance().getServer();
-    }
-
-    public void setCamera(int camera){
-        switch(camera){
-            case 1: server.setSource(camera1);
-            case 2: server.setSource(camera2);
-            case 3: server.setSource(camera3);
-        }
+        //camera3 = CameraServer.getInstance().startAutomaticCapture(2);
+        //server = CameraServer.getInstance().getServer();
     }
 }

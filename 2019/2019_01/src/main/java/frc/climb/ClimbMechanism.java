@@ -85,7 +85,7 @@ public class ClimbMechanism{
         curClimbState = climbState;
     }
 
-    public void climb(double driveSpeed){
+    public void climb(){
         switch(curClimbState){
             case TWOBOTFAST:
             currentGains = Constants.flexMode;
@@ -117,10 +117,10 @@ public class ClimbMechanism{
         double gain = Math.abs(error)>0.5 ? P+I+D : 0;
         double gainR = Math.abs(errorR)>0.5 ? PR+IR+DR : 0;
 
-        frontLeft.set(ControlMode.PercentOutput, driveSpeed-gain-gainR);
-        backLeft.set(ControlMode.PercentOutput, driveSpeed-gain+gainR);
-        frontRight.set(ControlMode.PercentOutput, driveSpeed+gain-gainR);
-        backRight.set(ControlMode.PercentOutput, driveSpeed+gain+gainR);
+        frontLeft.set(ControlMode.PercentOutput, 0.8-gain-gainR);
+        backLeft.set(ControlMode.PercentOutput, 0.8-gain+gainR);
+        frontRight.set(ControlMode.PercentOutput, 0.8+gain-gainR);
+        backRight.set(ControlMode.PercentOutput, 0.8+gain+gainR);
 
         integralError = integralError + (error*0.2);  
         lastError = error;

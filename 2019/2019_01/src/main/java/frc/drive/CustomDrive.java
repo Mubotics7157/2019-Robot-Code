@@ -3,6 +3,7 @@ package frc.drive;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.SerialPort.Port;
@@ -37,8 +38,14 @@ public class CustomDrive{
         rightSpark = new CANSparkMax(11, MotorType.kBrushless);
         rightSpark2 = new CANSparkMax(21, MotorType.kBrushless);
         //right = new CANPIDController(rightSpark);
-        rightSpark2.follow(rightSpark);
-        leftSpark2.follow(leftSpark);
+        //rightSpark2.follow(rightSpark);
+        //leftSpark2.follow(leftSpark);
+
+        leftSpark.setIdleMode(IdleMode.kCoast);
+        leftSpark2.setIdleMode(IdleMode.kCoast);
+        rightSpark.setIdleMode(IdleMode.kCoast);
+        rightSpark2.setIdleMode(IdleMode.kCoast);
+        
         
         //rightSpark.follow(rightSpark);
         curDriveState = DriveState.MANUAL;
@@ -135,5 +142,9 @@ public class CustomDrive{
 
         drive(driveSpeed + gain, driveSpeed - gain);
         lastError = error;
+    }
+
+    public void switchTarget(){
+        tracking.switchTarget();
     }
 }
