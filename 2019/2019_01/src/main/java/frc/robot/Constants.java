@@ -89,6 +89,9 @@ public class Constants {
         THREEMANCLIMB
     }
 
+    public static final int kTalonWinch = 30;
+    public static final int kTalonWinchSlave = 31;
+
     //INTAKE CONSTANTS
     public static final int kSparkLeft = 2;
     public static final int kSparkRight = 0;
