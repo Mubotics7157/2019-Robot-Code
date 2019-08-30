@@ -25,7 +25,7 @@ public class Intake {
     boolean intakeOut;
     boolean intakeClosed;
     boolean puckOut;
-    Compressor compressor;
+    //Compressor compressor;
 
     public void init(){
         intakeOut = false;
@@ -36,7 +36,7 @@ public class Intake {
         extendo = new DoubleSolenoid(Constants.kExtendo, Constants.kExtendoOut);
         grab = new DoubleSolenoid(Constants.kGrab, Constants.kGrabOut);
         puck = new DoubleSolenoid(Constants.kPuck, Constants.kPuckOut);
-        compressor = new Compressor();
+        //compressor = new Compressor();
         //compressor.stop();
     }
 

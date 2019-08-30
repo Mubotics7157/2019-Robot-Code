@@ -16,7 +16,7 @@ import frc.tracking.TrackingHandler;
 public class CustomDrive{
 
     CANSparkMax leftSpark;
-    CANSparkMax leftSpark2;
+    //CANSparkMax leftSpark2;
     CANSparkMax rightSpark;
     CANSparkMax rightSpark2;
     CANPIDController left;
@@ -30,21 +30,21 @@ public class CustomDrive{
         //leftSpark2.restoreFactoryDefaults();
         //rightSpark2.restoreFactoryDefaults();
         //rightSpark.restoreFactoryDefaults();
-        leftSpark = new CANSparkMax(10, MotorType.kBrushless);
-        leftSpark2 = new CANSparkMax(20, MotorType.kBrushless);
+        leftSpark = new CANSparkMax(11, MotorType.kBrushless);
+        //leftSpark2 = new CANSparkMax(10, MotorType.kBrushless);
         //left = new CANPIDController(leftSpark);
 
         //leftSpark.follow(null);
-        rightSpark = new CANSparkMax(11, MotorType.kBrushless);
-        rightSpark2 = new CANSparkMax(21, MotorType.kBrushless);
+        rightSpark = new CANSparkMax(21, MotorType.kBrushless);
+        rightSpark2 = new CANSparkMax(20, MotorType.kBrushless);
         //right = new CANPIDController(rightSpark);
         //rightSpark2.follow(rightSpark);
         //leftSpark2.follow(leftSpark);
 
         leftSpark.setIdleMode(IdleMode.kCoast);
-        leftSpark2.setIdleMode(IdleMode.kCoast);
+        //leftSpark2.setIdleMode(IdleMode.kCoast);
         rightSpark.setIdleMode(IdleMode.kCoast);
-        rightSpark2.setIdleMode(IdleMode.kCoast);
+        //rightSpark2.setIdleMode(IdleMode.kCoast);
         
         
         //rightSpark.follow(rightSpark);
@@ -78,7 +78,7 @@ public class CustomDrive{
     }
 
     public void driveSL(double speed){
-        leftSpark2.set(speed);
+        //leftSpark2.set(speed);
     }
     
     public void driveSR(double speed){
@@ -112,6 +112,10 @@ public class CustomDrive{
             SmartDashboard.putNumber("integralWindup", 0);
         }
         tracking.initTracking();
+    }
+
+    public void driveInACircle(){
+        drive(1, 1);
     }
 
     public void driveAutoPilot() {

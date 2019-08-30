@@ -13,7 +13,7 @@ import frc.robot.Constants.ClimbState;
 
 public class ClimbMechanism{
     TalonSRX frontLeft; 
-    TalonSRX backLeft; 
+    TalonSRX backLeft;
     TalonSRX frontRight;
     TalonSRX backRight;
 
@@ -95,6 +95,8 @@ public class ClimbMechanism{
             break;
             case TWOBOTSLOW:
             currentGains = Constants.stayMode;
+            case THREEMANCLIMB:
+            currentGains = Constants.flexMode;
         }
         error = navx.getPitch();
         errorR = navx.getRoll();

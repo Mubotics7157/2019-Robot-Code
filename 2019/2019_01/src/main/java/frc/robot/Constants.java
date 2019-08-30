@@ -58,10 +58,10 @@ public class Constants {
     }
 
     //CLIMB CONSTANTS
-    public static final int kClimbFrontLeft = 1;
-    public static final int kClimbFrontRight = 2;
-    public static final int kClimbBackLeft = 3;
-    public static final int kClimbBackRight = 4;
+    public static final int kClimbFrontLeft = 3;
+    public static final int kClimbFrontRight = 4;
+    public static final int kClimbBackLeft = 2;
+    public static final int kClimbBackRight = 1;
 
     public static double kPitchP = 0.1;
     public static double kPitchI = 0;
@@ -76,7 +76,7 @@ public class Constants {
     public static double kVoltageRamp = 0.2;
 
     public static final Gains sexyMode = new Gains(0.1, 0, 0, 0, 0.8);
-    public static final Gains flexMode = new Gains(0.2, 0, 2, 0, 0.8);
+    public static final Gains flexMode = new Gains(0.1, 0, 0, 0, 0.7);
     public static final Gains backwards = new Gains(0.2, 0, 20, 0, -0.8);
     public static final Gains stayMode = new Gains(0.1, 0, 0, 0, 0);
 
@@ -85,7 +85,8 @@ public class Constants {
         ONEBOTFAST,
         TWOBOTSLOW,
         TWOBOTFAST,
-        SEXYMODE
+        SEXYMODE,
+        THREEMANCLIMB
     }
 
     //INTAKE CONSTANTS
