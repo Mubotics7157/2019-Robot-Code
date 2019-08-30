@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.climb.ClimbMechanism;
+import frc.climb.Winch;
 import frc.drive.CustomDrive;
 import frc.robot.Constants.ArmState;
 import frc.robot.Constants.ClimbState;
@@ -37,6 +38,9 @@ public class Robot extends TimedRobot {
   public TowArm towArm = new TowArm();
   public CustomDrive customDrive = new CustomDrive();
   public ClimbMechanism climb = new ClimbMechanism();
+  public Winch winch = new Winch();
+
+  private ClimbRoutine climbRout = new ClimbRoutine();
   //public Arm arm = new Arm();
   //public Intake intake = new Intake();
   //public Forks forks = new Forks();
@@ -130,149 +134,10 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
   public void teleopInit(){
-    //arm.moveToState(ArmState.FREEHAND);
   }
 
-  /*public void testing(){
-    if(oi.bPressed(1, 1)){
-      intake.toggleExpandMandibles();
-    }
-    if(oi.bPressed(1, 2)){
-      intake.toggleExtend();
-    }
-    if(oi.bPressed(1, 4)){
-      intake.toggleIntake();
-    }
-    if(oi.bPressed(1, 5)){
-      intake.puck.set(Value.kForward);
-    }
-    if(oi.bPressed(1, 6)){
-      intake.puck.set(Value.kReverse);
-    }
-  }*/
   
   public void finalControlScheme(){
-    
-    //controller 0 = arcade
-    //controller 1 = flight
-    //controller 2 = leftDrive
-    //controller 3 = rightDrive
-    //BEFORE DRIVING CHECK CONTROLLER AXIS FOR DRIVE STICKS!!!
-
-    //CAMERA TOGGLES
-  /*
-    if(oi.bPressed(3, 2)){
-      camManager.setCamera(1);
-    }
-    if(oi.bPressed(3, 3)){
-      camManager.setCamera(2);
-    }
-    if(oi.bPressed(3, 4)){
-      camManager.setCamera(3);
-    }
-*/
-
-      /*
-      if(oi.bPressed(1, 9)){
-        arm.zeroEncoder();
-      }
-      //ARM + HATCH INTAKE
-      arm.setFreehandInput(oi.axis(1, 1));
-      //arm.setTow(0);
-
-      if(oi.bPressed(1, 1)){
-        intake.toggleExpandMandibles();
-      }
-      if(oi.bPressed(1, 2)){
-        intake.toggleExtend();
-      }
-      if(oi.bPressed(1, 4)){
-        intake.toggleIntake();
-      }
-
-      //arm.setTowInput(oi.axis(1, 2));
-    
-      intake.intake(oi.axis(1, 4));
-    
-      if(Math.abs(oi.axis(1, 1))>0.2){
-        arm.moveToState(ArmState.FREEHAND);
-        SmartDashboard.putNumber("Arm Input", oi.axis(1, 1));
-      }
-      
-      if(oi.bPressed(1, 6)){
-        arm.moveToState(ArmState.HATCH);
-      }
-    */
-      
-      
-      //CLIMB
-      
-      if(oi.axis(2)>0.2){
-        if(oi.bDown(1)){
-          climb.manualClimb(0, oi.axis(1));
-        }
-        if(oi.bDown(2)){
-          climb.manualClimb(1, oi.axis(1));
-        }
-        if(oi.bDown(3)){
-          climb.manualClimb(2, oi.axis(1));
-        }
-        if(oi.bDown(4)){
-          climb.manualClimb(3, oi.axis(1));
-        }
-      }else if(oi.axis(3)>0.2){
-        climb.manualClimb(oi.axis(1));
-      }else if(oi.bDown(8)){
-        climb.climb();
-      }else{
-        climb.manualClimb(0);
-      }
-      if(oi.bDown(7)){
-        towArm.setSpark(-1);
-      }else{
-        towArm.setSpark(0);
-      }
-
-      if(oi.bPressed(5)){
-        //climb.setClimbState(ClimbState.SEXYMODE);
-        towArm.extend();
-      }
-      if(oi.bPressed(6)){
-        //climb.setClimbState(ClimbState.THREEMANCLIMB);
-        towArm.reverse();
-      }
-     
-    
-
-
-    //DRIVE
-
-    if(oi.bPressed(3, 7)){
-      towArm.compressorOff();
-    }
-    if(oi.bPressed(3, 6)){
-      towArm.compressorOn();
-    }
-    if(oi.bPressed(2, 1)){
-      //customDrive.switchTarget();
-    }
-    if(oi.bPressed(0, 5)){
-      //towArm.toggleExtend();
-    }
-
-    double deadzone = 0.2;
-    boolean justSwitched = false;
-    /*if(oi.bDown(3, 1)){
-      customDrive.curDriveState = DriveState.AUTO;
-      justSwitched = false;
-    }else if(Math.abs(oi.axis(3, 1))>deadzone || Math.abs(oi.axis(2, 1))>deadzone){
-      customDrive.curDriveState = DriveState.MANUAL;
-      if(justSwitched == false){
-        System.out.println("Manual Override");
-      }
-      justSwitched = true;
-    }*/
-
     switch(customDrive.curDriveState){
       case AUTO:
       customDrive.driveAutoPilot();
@@ -281,256 +146,112 @@ public class Robot extends TimedRobot {
       if(oi.axis(2)<0.2 && !oi.bDown(3, 2)){
         customDrive.drive(-oi.axis(2, 1), oi.axis(3, 1));
       }
-      if(oi.bDown(3, 2)){
-        customDrive.driveInACircle();
-      }
-      /*if(oi.bDown(2, 1)){
-        customDrive.driveL(oi.axis(2, 1));
-      }else{
-        customDrive.driveSL(oi.axis(2, 1));
-      }
-      if(oi.bDown(3, 1)){
-        customDrive.driveR(oi.axis(3, 1));
-      }else{
-        customDrive.driveSR(oi.axis(3, 1));
-      }*/
-      
     }
+
+    //failsafes
+    winch.setWinch(0);
+    towArm.setSpark(0);
+
+    if (oi.bDown(0, 0)) {
+      climbRout.lowerForks();
+    }
+
+    if (oi.bDown(0, 3)) {
+      climbRout.raiseForks();
+    }
+
+    if (oi.bPressed(0, 5)) {
+      climbRout.extendTow();
+    }
+
+    if (oi.bDown(0, 4)) {
+      climbRout.runTow(0.9);
+    }
+
+    if (oi.bDown(0, 1)) {
+      climbRout.firstLegs();
+    }
+
+    if (oi.bPressed(0, 2)) {
+      climbRout.retractTow();
+    }
+
+    if (oi.bDown(0, 7)) {
+      climbRout.secondLegs();
+    }
+
+    if (oi.getPOV() == 0) {
+      climb.climb();
+    }
+
+    if (oi.bDown(0, 9)) {
+      if (oi.getPOV() == 0) {
+        climb.manualClimb(0, -1);
+      }
+
+      if (oi.getPOV() == 90) {
+        climb.manualClimb(1, -1);        
+      }
+
+      if (oi.getPOV() == 180) {
+        climb.manualClimb(2, -1);        
+      }
+
+      if (oi.getPOV() == 270) {
+        climb.manualClimb(3, -1);        
+      }
+    }
+    else if (oi.getPOV() == 180) {
+        climb.manualClimb(0, -1);
+        climb.manualClimb(1, -1);
+        climb.manualClimb(2, -1);
+        climb.manualClimb(3, -1);
+    }
+
   }
 
- 
-
-
-
-
-
-
-
-  
   public void processInputsFinalDrive(){
     switch(customDrive.curDriveState){
       case AUTO:
       customDrive.driveAutoPilot();
       case MANUAL:
       customDrive.drive(-oi.axis(1), oi.axis(5));
-    }
-    /*if(oi.bPressed(1) && customDrive.curDriveState==DriveState.AUTO){
-      customDrive.curDriveState = DriveState.MANUAL;
-    }else if(oi.bPressed(1) && customDrive.curDriveState==DriveState.MANUAL){
-      customDrive.curDriveState = DriveState.AUTO;
-    }*/
-
-  
-  /*public void processInputsFinalClimb(){
-    if(oi.bDown(8)){
-      climb.climb(0);
-    }
-    arm.setTow(oi.axis(2));
-    if(oi.bDown(5)){
-      climb.manualClimb(0, oi.axis(1));
-      climb.manualClimb(1, oi.axis(1));
-    }else{
-      climb.manualClimb(0, 0);
-      climb.manualClimb(1, 0);
-    }
-    if(oi.bDown(6)){
-      climb.manualClimb(2, oi.axis(1));
-      climb.manualClimb(3, oi.axis(1));
-    }else{
-      climb.manualClimb(2, 0);
-      climb.manualClimb(3, 0);
-    }
-    if(oi.bDown(5)==false && oi.bDown(6)==false){
-      customDrive.drive(oi.axis(1), oi.axis(5));
-    }
-  }
-  public void processInputsFinalArm(){
-    arm.setFreehandInput(oi.axis(1));
-    arm.setTowInput(oi.axis(1));
-    if(oi.axis(1)>0.2){
-      arm.moveToState(ArmState.FREEHAND);
-    }
-    if(oi.axis(2)>0.7){
-      if(arm.getArmAngle()>-90){
-        if(oi.bPressed(1)){
-          arm.moveToState(ArmState.INTAKING);
-        }
-        if(oi.bPressed(2)){
-          arm.moveToState(ArmState.HATCH);
-        }
-        if(oi.bPressed(3)){
-          arm.moveToState(ArmState.CARGO);
-        }
-        if(oi.bPressed(4)){
-          arm.moveToState(ArmState.NEUTRAL);
-        }
-      }
-      if(arm.getArmAngle()<-90){
-        if(oi.bPressed(1)){
-          arm.moveToState(ArmState.BACKINTAKING);
-        }
-        if(oi.bPressed(2)){
-          arm.moveToState(ArmState.BACKHATCH);
-        }
-        if(oi.bPressed(3)){
-          arm.moveToState(ArmState.BACKCARGO);
-        }
-        if(oi.bPressed(4)){
-          arm.moveToState(ArmState.NEUTRAL);
-        }
-        if(oi.bPressed(5)){
-          arm.moveToState(ArmState.FREEHAND);
-        }
-      }
-    }
-  }
-  public void processInputsTest2(){
-    //customDrive.drive(oi.axis(1), oi.axis(5));
-    if(oi.bPressed(1)){
-      intake.toggleExpandMandibles();
-    }
-    if(oi.bPressed(2)){
-      intake.toggleExtend();
-    }
-    if(oi.bPressed(3)){
-      intake.toggleIntake();
-    }
-    arm.printArmAngle();
-  }
-  public void processInputsTest(){
-    if(oi.axis(2)>0.7){
-      climb.manualClimb(oi.axis(1));
-    }else{
-      climb.manualClimb(0);
-    }
-  }
-  public void processInputsArcade(){
-    if(oi.bPressed(10)){
-      arm.zeroEncoder();
-    }
-
-    if(oi.axis(2)>0.7){
-      if(oi.bPressed(2)){
-        arm.moveToState(ArmState.INTAKING);
-      }
-      if(oi.bPressed(3)){
-        arm.moveToState(ArmState.HATCH);
-      }
-      if(oi.bPressed(8)){
-        arm.moveToState(ArmState.CARGO);
-      }
-      if(oi.bPressed(7)){
-        arm.moveToState(ArmState.NEUTRAL);
-      }
-    }
-
-    if(oi.axis(3)>0.7){
-      if(oi.bPressed(1)){
-        arm.moveToState(ArmState.BACKINTAKING);
-      }
-      if(oi.bPressed(4)){
-        arm.moveToState(ArmState.BACKHATCH);
-      }
-      if(oi.bPressed(6)){
-        arm.moveToState(ArmState.BACKCARGO);
-      }
-      if(oi.bPressed(5)){
-        arm.moveToState(ArmState.NEUTRAL);
-      }
-    }
-
-  }
-  public void processInputsClimb(){
-    if(oi.axis(3)>0.7){
-      if(oi.bDown(1)){
-        climb.manualClimb(0, oi.axis(1)); //frontLeft
-      }
-      if(oi.bDown(2)){
-        climb.manualClimb(1, oi.axis(1)); //backLeft
-      }
-      if(oi.bDown(3)){
-        climb.manualClimb(2, oi.axis(1)); //frontRight
-      }
-      if(oi.bDown(4)){
-        climb.manualClimb(3, oi.axis(1)); //backRight
-      }
-    }
-    if(oi.axis(2)>0.7){
-      climb.manualClimb(oi.axis(1));
-    }
-    if(oi.axis(2)<0.7 && oi.axis(3)<0.7){
-      climb.manualClimb(0);
-    }
-    
-    if(oi.bDown(5) && oi.bDown(6)){
-      climb.setClimbState(ClimbState.SEXYMODE);
-      climb.climb(0.6);
-    }else if(oi.bDown(5)){
-      climb.setClimbState(ClimbState.TWOBOTSLOW);
-      climb.climb(0);
-    }
-    if(oi.bPressed(8)){
-      climb.setClimbState(ClimbState.SEXYMODE);
-    }
-    if(oi.bPressed(9)){
-      climb.setClimbState(ClimbState.TWOBOTSLOW);
-    }
-    //climb.manualClimb(oi.axis(1));
+    }  
   }
 
-  public void processInputsGamepad(){
-    /*switch(customDrive.curDriveState){
-      case MANUAL:
-      customDrive.drive(oi.axis(1,1), oi.axis(2,1));
-      case AUTO:
-      customDrive.driveAutoPilot();
-    }*/
+  public class ClimbRoutine {
+    public void lowerForks() {
+      winch.setWinch(-1);
+    }
 
-    //forks.setServo(oi.axis(5));
-   /*
-    if(oi.bPressed(6)){
-      arm.zeroEncoder();
+    public void raiseForks() {
+      winch.setWinch(1);
     }
-    if(Math.abs(oi.axis(1))>0.3){
-      arm.moveToState(ArmState.FREEHAND);
-    }
-    if(oi.axis(2)>0.7){
-      if(oi.bPressed(1)){
-        arm.moveToState(ArmState.INTAKING);
-      }
-      if(oi.bPressed(2)){
-        arm.moveToState(ArmState.HATCH);
-      }
-      if(oi.bPressed(3)){
-        arm.moveToState(ArmState.CARGO);
-      }
-      if(oi.bPressed(4)){
-        arm.moveToState(ArmState.NEUTRAL);
-      }
-    }
-    if(oi.axis(3)>0.7){
-      if(oi.bPressed(1)){
-        arm.moveToState(ArmState.BACKINTAKING);
-      }
-      if(oi.bPressed(2)){
-        arm.moveToState(ArmState.BACKHATCH);//-30
-      }
-      if(oi.bPressed(3)){
-        arm.moveToState(ArmState.BACKCARGO);//
-      }
-      if(oi.bPressed(4)){
-        arm.moveToState(ArmState.NEUTRAL);
-      }
-      if(oi.bPressed(5)){
-        arm.moveToState(ArmState.FREEHAND);
-      }
-    }
-    //intake.intake(oi.controller1.getRawAxis(1));
-    arm.setFreehandInput(oi.axis(1));
-    arm.setTowInput(oi.axis(1));*/
 
-    /*if(oi.bDown(1,1)&&oi.bDown(1,2)&&oi.bDown(1,3)&&oi.bDown(1,4)&&oi.bDown(1,5)&&oi.bDown(1,6)&&oi.bDown(1,7)&&oi.bDown(1,8)){
-      forks.eatDinner();
-    }*/
+    public void climb() {
+      climb.climb();
+    }
+
+    public void extendTow() {
+      towArm.extend();
+    }
+
+    public void runTow(double speed) {
+      towArm.setSpark(speed);
+    }
+
+    public void firstLegs() {
+      climb.manualClimb(0, -1);
+      climb.manualClimb(1, -1);
+    }
+
+    public void retractTow() {
+      towArm.reverse();
+    }
+
+    public void secondLegs() {
+      climb.manualClimb(2, -1);
+      climb.manualClimb(3, -1);
+    }
   }
 }
