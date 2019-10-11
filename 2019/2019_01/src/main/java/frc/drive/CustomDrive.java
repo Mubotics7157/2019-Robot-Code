@@ -16,7 +16,7 @@ import frc.tracking.TrackingHandler;
 public class CustomDrive{
 
     CANSparkMax leftSpark;
-    //CANSparkMax leftSpark2;
+    CANSparkMax leftSpark2;
     CANSparkMax rightSpark;
     CANSparkMax rightSpark2;
     CANPIDController left;
@@ -30,13 +30,18 @@ public class CustomDrive{
         //leftSpark2.restoreFactoryDefaults();
         //rightSpark2.restoreFactoryDefaults();
         //rightSpark.restoreFactoryDefaults();
-        leftSpark = new CANSparkMax(11, MotorType.kBrushless);
-        //leftSpark2 = new CANSparkMax(10, MotorType.kBrushless);
+        leftSpark = new CANSparkMax(10, MotorType.kBrushless);
+        leftSpark2 = new CANSparkMax(20, MotorType.kBrushless);
         //left = new CANPIDController(leftSpark);
+        leftSpark.restoreFactoryDefaults();
+        leftSpark2.restoreFactoryDefaults();
 
         //leftSpark.follow(null);
-        rightSpark = new CANSparkMax(21, MotorType.kBrushless);
-        rightSpark2 = new CANSparkMax(20, MotorType.kBrushless);
+        rightSpark = new CANSparkMax(11, MotorType.kBrushless);
+        rightSpark2 = new CANSparkMax(21, MotorType.kBrushless);
+
+        rightSpark.restoreFactoryDefaults();
+        rightSpark2.restoreFactoryDefaults();
         //right = new CANPIDController(rightSpark);
         //rightSpark2.follow(rightSpark);
         //leftSpark2.follow(leftSpark);
@@ -78,15 +83,17 @@ public class CustomDrive{
     }
 
     public void driveSL(double speed){
-        //leftSpark2.set(speed);
+        leftSpark2.set(speed);
     }
     
     public void driveSR(double speed){
         rightSpark2.set(speed);
     }
     public void drive(double lSpeed, double rSpeed){
-        leftSpark.set(Math.abs(lSpeed) > 0.02 ? lSpeed : 0);   
+        leftSpark.set(Math.abs(lSpeed) > 0.02 ? lSpeed : 0); 
+        leftSpark2.set(Math.abs(lSpeed) > 0.02 ? lSpeed : 0);   
         rightSpark.set(Math.abs(rSpeed) > 0.02 ? rSpeed : 0);
+        rightSpark2.set(Math.abs(rSpeed) > 0.02 ? rSpeed : 0);
     }
 
     public void printEncoders(){

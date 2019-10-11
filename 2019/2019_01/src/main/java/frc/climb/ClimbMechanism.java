@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Gains;
@@ -17,7 +18,7 @@ public class ClimbMechanism{
     TalonSRX frontRight;
     TalonSRX backRight;
 
-    public AHRS navx = new AHRS(SPI.Port.kMXP);
+    public AHRS navx = new AHRS(SPI.Port.kMXP);//formerly SPI.Port.kMXP
 
     double error, deltaError, lastError;
     double errorR, deltaErrorR, lastErrorR;
@@ -26,6 +27,9 @@ public class ClimbMechanism{
 
     ClimbState curClimbState;
     Gains currentGains;
+
+    private double cRoll = 0;
+    private double cPitch = 0;
 
     public void init() {
         //towOut = false;
@@ -60,6 +64,24 @@ public class ClimbMechanism{
         backRight.configClosedloopRamp(Constants.kVoltageRamp);
     }
 
+    public void recalibrate(){
+        navx.reset();
+        //navx.zeroYaw();
+    }
+
+    public void jankRecalibrate() {
+        cPitch = navx.getPitch();
+        cRoll = navx.getRoll();
+    }
+
+    private double getPitch() {
+        return navx.getPitch() - cPitch;
+    }
+
+    private double getRoll() {
+        return navx.getRoll() - cRoll;
+    }
+
     public void manualClimb(int talon, double driveSpeed){
         //talons[talon].set(ControlMode.PercentOutput, driveSpeed);
         switch(talon){
@@ -85,21 +107,26 @@ public class ClimbMechanism{
         curClimbState = climbState;
     }
 
-    public void climb(){
-        switch(curClimbState){
-            case TWOBOTFAST:
-            currentGains = Constants.flexMode;
-            break;
+    public void climb(ClimbState cstate){
+        if (navx.isCalibrating()) {
+            return;
+        }
+        switch(cstate){
             case SEXYMODE:
             currentGains = Constants.sexyMode;
             break;
-            case TWOBOTSLOW:
+            case STATIC:
             currentGains = Constants.stayMode;
+            break;
+            case REVERSE:
+            currentGains = Constants.backwards;
+            break;
             case THREEMANCLIMB:
-            currentGains = Constants.flexMode;
+            currentGains = Constants.threeManMode;
         }
-        error = navx.getPitch();
-        errorR = navx.getRoll();
+        //System.out.println("asdf");
+        error = -getRoll();
+        errorR = getPitch();
         SmartDashboard.putNumber("error", error);
         SmartDashboard.putNumber("errorR", errorR);
         deltaError = error-lastError;
@@ -116,17 +143,33 @@ public class ClimbMechanism{
         double DR = currentGains.kD*deltaErrorR;
         double IR = currentGains.kI*integralErrorR;
 
-        double gain = Math.abs(error)>0.5 ? P+I+D : 0;
-        double gainR = Math.abs(errorR)>0.5 ? PR+IR+DR : 0;
+        double gain = Math.abs(error)>0.2 ? P+I+D : 0;
+        double gainR = Math.abs(errorR)>0.2 ? PR+IR+DR : 0;
 
-        frontLeft.set(ControlMode.PercentOutput, 0.8-gain-gainR);
-        backLeft.set(ControlMode.PercentOutput, 0.8-gain+gainR);
-        frontRight.set(ControlMode.PercentOutput, 0.8+gain-gainR);
-        backRight.set(ControlMode.PercentOutput, 0.8+gain+gainR);
+        double driveSpeed = currentGains.driveSpeed;
+
+        frontLeft.set(ControlMode.PercentOutput, driveSpeed-gain-gainR);
+        backLeft.set(ControlMode.PercentOutput, driveSpeed-gain+gainR);
+        frontRight.set(ControlMode.PercentOutput, driveSpeed+gain-gainR);
+        backRight.set(ControlMode.PercentOutput, driveSpeed+gain+gainR);
 
         integralError = integralError + (error*0.2);  
         lastError = error;
         integralErrorR = integralErrorR + (errorR*0.2);
         lastErrorR = errorR;
+
+        SmartDashboard.putNumber("error", error);
+        SmartDashboard.putNumber("errorR", errorR);
+        SmartDashboard.putNumber("driveSpeed", driveSpeed);
+        int state = 0;
+        switch(curClimbState){
+            case SEXYMODE: state = 1;
+            break;
+            case REVERSE: state = 2;
+            break;
+            case THREEMANCLIMB: state = 3;
+            break;
+        }
+        SmartDashboard.putNumber("state", state);
     }
 }

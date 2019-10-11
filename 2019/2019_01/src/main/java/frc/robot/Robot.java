@@ -56,12 +56,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     //arm.init();
     customDrive.init();
-    towArm.init();
+    //towArm.init();
     //customDrive.initTracking();
     climb.init();
     //intake.init();
     //forks.init();
     //camManager.init();
+    winch.init();
   }
 
   /**
@@ -90,6 +91,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    climbRout.retractTow();
     m_autoSelected = m_chooser.getSelected();
     // autoSelected = SmartDashboard.getString("Auto Selector",
     // defaultAuto);
@@ -124,6 +126,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Roll", climb.navx.getRoll());
   
     finalControlScheme();
+    //winch.printLimit();
     //arm.periodic();
   }
 
@@ -134,6 +137,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
   public void teleopInit(){
+    climbRout.retractTow();
   }
 
   
@@ -144,47 +148,75 @@ public class Robot extends TimedRobot {
       
       case MANUAL:
       if(oi.axis(2)<0.2 && !oi.bDown(3, 2)){
-        customDrive.drive(-oi.axis(2, 1), oi.axis(3, 1));
+        customDrive.drive(oi.axis(3, 1), -oi.axis(2, 1));
       }
     }
 
     //failsafes
-    winch.setWinch(0);
-    towArm.setSpark(0);
+    //winch.setWinch(0);
+    //towArm.setSpark(0);
 
-    if (oi.bDown(0, 0)) {
-      climbRout.lowerForks();
-    }
+    
 
-    if (oi.bDown(0, 3)) {
-      climbRout.raiseForks();
-    }
-
-    if (oi.bPressed(0, 5)) {
+    if (oi.bPressed(0, 6)) {
       climbRout.extendTow();
     }
 
-    if (oi.bDown(0, 4)) {
-      climbRout.runTow(0.9);
+    if (oi.bDown(0, 5)) {
+      climbRout.runTow(-0.9);
+    }else{
+      climbRout.runTow(0);
     }
 
-    if (oi.bDown(0, 1)) {
-      climbRout.firstLegs();
+    if (oi.bDown(0, 2)) {
+      //climbRout.firstLegs();
     }
 
-    if (oi.bPressed(0, 2)) {
+    if (oi.axis(0, 3) == 1) {
       climbRout.retractTow();
     }
 
-    if (oi.bDown(0, 7)) {
-      climbRout.secondLegs();
+    if (oi.bDown(0, 8)) {
+      //climbRout.secondLegs();
     }
 
-    if (oi.getPOV() == 0) {
-      climb.climb();
+    if (oi.getPOV() == 0 && !oi.bDown(0, 9) && oi.axis(0, 2) == 0) {
+      //climb.climb();
     }
 
-    if (oi.bDown(0, 9)) {
+    if(oi.bDown(0, 8)){
+      climb.manualClimb(0, -0.8);
+      climb.manualClimb(1, -0.8);
+    }
+
+    if(oi.bDown(0, 2)){
+      climb.manualClimb(2, -0.8);
+      climb.manualClimb(3, -0.8);
+    }
+
+
+    if(oi.axis(0, 2) == 1){
+      //climb.setClimbState(ClimbState.SEXYMODE);
+      climb.climb(ClimbState.SEXYMODE);
+      System.out.println("climbing");
+    }
+    if(oi.bDown(0, 1)){
+      //climb.setClimbState(ClimbState.REVERSE);
+      climb.climb(ClimbState.REVERSE);
+      System.out.println("reversing");
+    }
+    if(oi.bDown(0, 3)){
+      //climb.setClimbState(ClimbState.STATIC);
+      climb.climb(ClimbState.STATIC);
+      System.out.println("balancing");
+    }
+    if(oi.bDown(0, 4)){
+      //climb.setClimbState(ClimbState.THREEMANCLIMB);
+      climb.climb(ClimbState.THREEMANCLIMB);
+      System.out.println("three man");
+      //climbRout.lowerForks();
+    }
+    /*if (oi.bDown(0, 10)) {
       if (oi.getPOV() == 0) {
         climb.manualClimb(0, -1);
       }
@@ -200,12 +232,59 @@ public class Robot extends TimedRobot {
       if (oi.getPOV() == 270) {
         climb.manualClimb(3, -1);        
       }
+    }else if(oi.axis(0, 2) == 1){
+      if (oi.getPOV() == 0) {
+        climb.manualClimb(0, 1);
+      }
+
+      if (oi.getPOV() == 90) {
+        climb.manualClimb(1, 1);        
+      }
+
+      if (oi.getPOV() == 180) {
+        climb.manualClimb(2, 1);        
+      }
+
+      if (oi.getPOV() == 270) {
+        climb.manualClimb(3, 1);        
+      }
     }
     else if (oi.getPOV() == 180) {
-        climb.manualClimb(0, -1);
-        climb.manualClimb(1, -1);
-        climb.manualClimb(2, -1);
-        climb.manualClimb(3, -1);
+        //climb.manualClimb(0, -1);
+        //climb.manualClimb(1, -1);
+        //climb.manualClimb(2, -1);
+        //climb.manualClimb(3, -1);
+    }*/
+
+    //gamepad controls
+    if(oi.axis(1, 2) > 0.5){
+      if(oi.bDown(1, 1)){
+        climb.manualClimb(0, oi.axis(1, 1));//front left
+      }
+      if(oi.bDown(1, 2)){
+        climb.manualClimb(1, oi.axis(1, 1));//front right
+      }
+      if(oi.bDown(1, 3)){
+        climb.manualClimb(2, oi.axis(1, 1));//back left
+      }
+      if(oi.bDown(1, 4)){
+        climb.manualClimb(3, oi.axis(1, 1));//back right
+      }
+    }else if(oi.axis(0, 2) != 1 && !oi.bDown(0, 1) && !oi.bDown(0, 2) && !oi.bDown(0, 8) && !oi.bDown(0, 3) && !oi.bDown(0, 4)){
+      climb.manualClimb(0, 0);
+      climb.manualClimb(1, 0);
+      climb.manualClimb(2, 0);
+      climb.manualClimb(3, 0);
+    }
+    if(oi.bPressed(1, 8)){
+      climb.jankRecalibrate();
+      System.out.println("recalibrated");
+    }
+
+    if(oi.axis(1, 3) > 0.5){
+      winch.setWinch(oi.axis(1, 5));
+    }else{
+      winch.setWinch(0);
     }
 
   }
@@ -221,23 +300,27 @@ public class Robot extends TimedRobot {
 
   public class ClimbRoutine {
     public void lowerForks() {
-      winch.setWinch(-1);
-    }
-
-    public void raiseForks() {
       winch.setWinch(1);
     }
 
+    public void raiseForks() {
+      winch.setWinch(-1);
+    }
+
+    public void stopForks(){
+      winch.setWinch(0);
+    }
+
     public void climb() {
-      climb.climb();
+      //climb.climb();
     }
 
     public void extendTow() {
-      towArm.extend();
+      winch.extendTow();
     }
 
     public void runTow(double speed) {
-      towArm.setSpark(speed);
+      winch.setTowWheels(speed);
     }
 
     public void firstLegs() {
@@ -246,7 +329,7 @@ public class Robot extends TimedRobot {
     }
 
     public void retractTow() {
-      towArm.reverse();
+      winch.retractTow();
     }
 
     public void secondLegs() {

@@ -7,9 +7,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
@@ -30,12 +32,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  public WPI_TalonSRX talon = new WPI_TalonSRX(2);
-  public WPI_VictorSPX victor = new WPI_VictorSPX(3);
-  public WPI_VictorSPX victor2 = new WPI_VictorSPX(4);
-  public PWMVictorSPX PWMVictor = new PWMVictorSPX(9);
+  //public WPI_TalonSRX talon = new WPI_TalonSRX(2);
+  public WPI_VictorSPX backLeft = new WPI_VictorSPX(4);
+  public WPI_VictorSPX backRight = new WPI_VictorSPX(3);
+  public PWMVictorSPX frontLeft = new PWMVictorSPX(9);
+  public PWMVictorSPX frontRight = new PWMVictorSPX(8);
   public Joystick controller1 = new Joystick(0);
-  public Pixy2Handler version = new Pixy2Handler();
+  public Joystick controller2 = new Joystick(1);
+  //public Pixy2Handler version = new Pixy2Handler();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -46,9 +50,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    victor.follow(victor2);
-    version.init();
-    
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**
@@ -103,25 +105,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //PWMVictor.set(-controller1.getRawAxis(1));
-    //talon.set(-controller1.getRawAxis(1));
-    //victor.set(controller1.getRawAxis(5));
-
-    if(controller1.getRawButtonPressed(5)){
-      System.out.println("beginning transfer...");
-      //version.RequestBytes();
-      version.HandleInput();
-      
-      //version.readWord();
-    }
-    if(controller1.getRawButtonPressed(6)){
-      version.toggleLamp();
-    }
-
+    backLeft.set(ControlMode.PercentOutput, -controller1.getRawAxis(1));
+    frontLeft.set(-controller1.getRawAxis(1));
+    backRight.set(ControlMode.PercentOutput, controller2.getRawAxis(1));
+    frontRight.set(controller2.getRawAxis(1));
   }
 
   public void teleopInit(){
-    version.HandleInput();
+
   }
 
   /**

@@ -19,6 +19,8 @@ public class TowArm {
     Spark towSpark;
     DoubleSolenoid extendo;
 
+
+    //this class is no longer being used. Use tow arm in Winch class instead.
     public void init(){
         comp = new Compressor();
         towSpark = new Spark(0);
@@ -29,10 +31,12 @@ public class TowArm {
         towSpark.set(speed);
     }
     public void extend(){
+        isOut = true;
         extendo.set(Value.kForward);
     }
 
     public void reverse(){
+        isOut = false;
         extendo.set(Value.kReverse);
     }
 
